@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Токени бренду «Лад» (lad-brand-spec.md) */
+@theme {
+  --color-bg: #333333; /* Графіт: фон */
+  --color-surface: #3f3b38; /* Сцена: картки */
+  --color-line: #4a4541; /* Пульт: межі */
+  --color-ink: #2a2724; /* Чорнило: текст на жовтому, бічна панель */
+  --color-cream: #fbe4d4; /* Крем: основний текст */
+  --color-muted: #c9b8a8; /* приглушений текст */
+  --color-taupe: #a8937f; /* Тауп: плитки, неактивні іконки */
+  --color-dim: #7a6a5e; /* вимкнені іконки, рамки кнопок */
+  --color-amber: #ffc800; /* Бурштин: акцент */
+  --color-amber-active: #e0ae00;
+  --color-danger: #e5694f;
+  --color-success: #8db580;
+
+  --radius-tile: 10px;
+  --radius-card: 20px;
+  --radius-panel: 28px;
+
+  --font-heading: var(--font-unbounded), "Unbounded", system-ui, sans-serif;
+  --font-sans: var(--font-onest), "Onest", system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+}
+
+body {
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,186 @@
+// Схема БД «Лад» (v0.2). Джерело: lad-db-schema.md у Project.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleKind {
+  system
+  music
+}
+
+enum AuthProvider {
+  google
+  email
+}
+
+enum Language {
+  en
+  uk
+}
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  language    Language  @default(en)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  identities    AuthIdentity[]
+  refreshTokens RefreshToken[]
+  roles         UserRole[]     @relation("RoleOwner")
+  grantedRoles  UserRole[]     @relation("RoleGrantedBy")
+  playlists     Playlist[]
+  createdSongs  Song[]         @relation("SongCreatedBy")
+  updatedSongs  Song[]         @relation("SongUpdatedBy")
+
+  @@map("users")
+}
+
+model AuthIdentity {
+  id             String       @id @default(cuid())
+  userId         String
+  provider       AuthProvider
+  providerUserId String?
+  createdAt      DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("auth_identities")
+}
+
+model LoginCode {
+  id        String    @id @default(cuid())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int       @default(0)
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email, expiresAt])
+  @@map("login_codes")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  kind        RoleKind
+  nameEn      String
+  nameUk      String
+  isRemovable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  users     UserRole[]
+  playlists Playlist[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId      String
+  roleId      String
+  grantedById String?
+  grantedAt   DateTime @default(now())
+
+  user      User  @relation("RoleOwner", fields: [userId], references: [id], onDelete: Cascade)
+  role      Role  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("RoleGrantedBy", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model Song {
+  id          String    @id @default(cuid())
+  title       String
+  artist      String
+  language    Language
+  originalKey String
+  /// Текст з акордами у стилі ChordPro: [Am]Слова [G]тут
+  body        String    @db.Text
+  /// Зростає при кожній зміні вмісту; копії порівнюють її зі своєю synced_version
+  version     Int       @default(1)
+  createdById String?
+  updatedById String?
+  /// М'яке видалення: з каталогу зникає, запис лишається для копій
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy User?       @relation("SongCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User?       @relation("SongUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  copies    SongCopy[]
+
+  @@index([title])
+  @@index([artist])
+  @@index([deletedAt])
+  @@map("songs")
+}
+
+model Playlist {
+  id         String   @id @default(cuid())
+  userId     String
+  /// NULL = плейлист «без ролі»
+  musicRoleId String?
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  musicRole Role?      @relation(fields: [musicRoleId], references: [id], onDelete: Cascade)
+  copies    SongCopy[]
+
+  @@index([userId, musicRoleId])
+  @@map("playlists")
+}
+
+model SongCopy {
+  id            String   @id @default(cuid())
+  playlistId    String
+  position      Int
+  /// NULL, якщо копію «залишили як власну»
+  sourceSongId  String?
+  title         String
+  artist        String
+  language      Language
+  originalKey   String
+  body          String   @db.Text
+  /// Зсув тональності в півтонах; відображення = body + зсув
+  keyShift      Int      @default(0)
+  notes         String   @default("") @db.Text
+  syncedVersion Int?
+  isStandalone  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  sourceSong Song?    @relation(fields: [sourceSongId], references: [id], onDelete: SetNull)
+
+  @@index([playlistId, position])
+  @@index([sourceSongId])
+  @@map("song_copies")
+}
