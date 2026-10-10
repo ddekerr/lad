@@ -30,6 +30,38 @@ export const IconMusic = (p: P) => (
   </Icon>
 );
 
+export const IconUser = (p: P) => (
+  <Icon {...p}>
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </Icon>
+);
+
+export const IconUsers = (p: P) => (
+  <Icon {...p}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </Icon>
+);
+
+export const IconTags = (p: P) => (
+  <Icon {...p}>
+    <path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19" />
+    <path d="M9.586 1.586A2 2 0 0 0 8.172 1H3a2 2 0 0 0-2 2v5.172a2 2 0 0 0 .586 1.414l6.71 6.71a2.4 2.4 0 0 0 3.404 0l4.592-4.592a2.4 2.4 0 0 0 0-3.404z" />
+    <circle cx="6.5" cy="6.5" r=".5" fill="currentColor" />
+  </Icon>
+);
+
+export const IconWarning = (p: P) => (
+  <Icon {...p}>
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
+  </Icon>
+);
+
 export const IconMinus = (p: P) => (
   <Icon {...p}>
     <path d="M5 12h14" />
