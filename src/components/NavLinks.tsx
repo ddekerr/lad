@@ -2,18 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconMusic, IconTags, IconUser, IconUsers } from "./icons";
+import { IconList, IconMusic, IconTags, IconUser, IconUsers } from "./icons";
 
 export type NavItem = {
   href: string;
   label: string;
-  icon: "music" | "user" | "users" | "tags";
+  icon: "music" | "list" | "user" | "users" | "tags";
 };
 
-const ICONS = { music: IconMusic, user: IconUser, users: IconUsers, tags: IconTags };
+const ICONS = { music: IconMusic, list: IconList, user: IconUser, users: IconUsers, tags: IconTags };
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/" || pathname.startsWith("/songs");
+  if (href === "/playlists") return pathname.startsWith("/playlists") || pathname.startsWith("/copies");
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 

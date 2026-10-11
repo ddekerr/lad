@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { shouldPreferFlats, transposeKey } from "@/lib/chords";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
-import { IconClose, IconMinus, IconPause, IconPlay, IconPlus } from "./icons";
+import { IconChevronLeft, IconChevronRight, IconClose, IconMinus, IconPause, IconPlay, IconPlus } from "./icons";
 import { SongBody } from "./SongBody";
 
 type Props = {
@@ -13,6 +13,9 @@ type Props = {
   body: string;
   initialShift: number;
   backHref: string;
+  /** Сусідні пісні плейлиста (лише для копій) */
+  prev?: { href: string; title: string } | null;
+  next?: { href: string; title: string } | null;
   t: Dictionary;
 };
 
@@ -24,7 +27,7 @@ const HIDE_BARS_AFTER_MS = 3000;
  * Режим сцени: темний повноекранний вигляд, великий текст, автопрокрутка,
  * зміна розміру шрифту й тональності. Дотик на текст ставить прокрутку на паузу.
  */
-export function StageClient({ title, originalKey, body, initialShift, backHref, t }: Props) {
+export function StageClient({ title, originalKey, body, initialShift, backHref, prev, next, t }: Props) {
   const [size, setSize] = useState(36);
   const [shift, setShift] = useState(((initialShift % 12) + 12) % 12);
   const [speed, setSpeed] = useState(4);
@@ -183,6 +186,15 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
       <footer
         className={`${barClass} flex min-h-20 items-center justify-center gap-5 border-t border-line px-4`}
       >
+        {prev && (
+          <Link
+            href={prev.href}
+            aria-label={`${t.stage.prev}: ${prev.title}`}
+            className="flex size-12 flex-none items-center justify-center rounded-[12px] bg-line"
+          >
+            <IconChevronLeft size={22} />
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => {
@@ -208,6 +220,15 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
             className="flex-1 accent-amber"
           />
         </div>
+        {next && (
+          <Link
+            href={next.href}
+            aria-label={`${t.stage.next}: ${next.title}`}
+            className="flex size-12 flex-none items-center justify-center rounded-[12px] bg-line"
+          >
+            <IconChevronRight size={22} />
+          </Link>
+        )}
       </footer>
     </div>
   );

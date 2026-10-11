@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AddToPlaylist } from "@/components/AddToPlaylist";
 import { IconChevronLeft } from "@/components/icons";
 import { SongView } from "@/components/SongView";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth/session";
 import { getDictionary } from "@/lib/i18n/server";
+import { roleName } from "@/lib/playlists";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +26,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Перегляд пісні: публічний, змінює лише відображення в браузері. */
 export default async function SongPage({ params }: Props) {
   const { id } = await params;
-  const [song, { t }] = await Promise.all([findSong(id), getDictionary()]);
+  const [song, { locale, t }, user] = await Promise.all([
+    findSong(id),
+    getDictionary(),
+    getCurrentUser(),
+  ]);
   if (!song) notFound();
+
+  const playlists = user
+    ? (
+        await prisma.playlist.findMany({
+          where: { userId: user.id },
+          orderBy: [{ musicRoleId: "asc" }, { createdAt: "asc" }],
+          select: { id: true, name: true, musicRole: { select: { nameEn: true, nameUk: true } } },
+        })
+      ).map((p) => ({
+        id: p.id,
+        name: p.name,
+        roleLabel: p.musicRole ? roleName(p.musicRole, locale) : t.playlists.noRole,
+      }))
+    : null;
 
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -44,6 +65,8 @@ export default async function SongPage({ params }: Props) {
           </span>
         </div>
       </div>
+
+      <AddToPlaylist songId={song.id} playlists={playlists} t={t} />
 
       <SongView id={song.id} body={song.body} originalKey={song.originalKey} t={t} />
     </main>

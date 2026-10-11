@@ -122,3 +122,21 @@ export const IconExpand = (p: P) => (
     <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
   </Icon>
 );
+
+export const IconList = (p: P) => (
+  <Icon {...p}>
+    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+  </Icon>
+);
+
+export const IconArrowUp = (p: P) => (
+  <Icon {...p}>
+    <path d="m5 12 7-7 7 7M12 19V5" />
+  </Icon>
+);
+
+export const IconArrowDown = (p: P) => (
+  <Icon {...p}>
+    <path d="m19 12-7 7-7-7M12 5v14" />
+  </Icon>
+);
