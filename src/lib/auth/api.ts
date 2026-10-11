@@ -12,3 +12,11 @@ export async function requireMember(): Promise<MemberResult> {
   if (!can(user.actor, "playlist:manage")) return { response: forbidden() };
   return { user };
 }
+
+/** Для редагування каталогу: потрібна роль Editor (дія song:write). */
+export async function requireEditor(): Promise<MemberResult> {
+  const user = await getCurrentUser();
+  if (!user) return { response: unauthorized() };
+  if (!can(user.actor, "song:write")) return { response: forbidden() };
+  return { user };
+}

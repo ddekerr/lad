@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IconChevronRight, IconSearch } from "@/components/icons";
+import { can } from "@/lib/auth/permissions";
+import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { getDictionary } from "@/lib/i18n/server";
 import { catalogWhere } from "@/lib/songs";
@@ -16,7 +18,7 @@ type Props = { searchParams: Promise<{ q?: string }> };
 
 /** Каталог пісень (головна). Публічний: доступний гостю без входу. */
 export default async function CatalogPage({ searchParams }: Props) {
-  const { t } = await getDictionary();
+  const [{ t }, user] = await Promise.all([getDictionary(), getCurrentUser()]);
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
 
@@ -35,6 +37,15 @@ export default async function CatalogPage({ searchParams }: Props) {
             {songs.length} {t.catalog.count}
           </p>
         </div>
+
+        {user && can(user.actor, "song:write") && (
+          <Link
+            href="/songs/new"
+            className="flex min-h-11 items-center justify-center rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
+          >
+            {t.editor.newSong}
+          </Link>
+        )}
 
         <form role="search" className="flex w-full gap-2 sm:max-w-md">
           <label htmlFor="q" className="sr-only">

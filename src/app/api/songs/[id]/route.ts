@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireEditor } from "@/lib/auth/api";
+import { badRequest, notFound } from "@/lib/auth/guard";
 import { prisma } from "@/lib/db";
+import { contentChanged, parseSongInput } from "@/lib/song-input";
 
 export const dynamic = "force-dynamic";
 
@@ -25,4 +28,43 @@ export async function GET(_request: Request, { params }: Context) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
   return NextResponse.json({ song });
+}
+
+/** PATCH /api/songs/{id}: змінити пісню (Editor). Версія зростає, лише якщо змінився вміст. */
+export async function PATCH(request: Request, { params }: Context) {
+  const auth = await requireEditor();
+  if ("response" in auth) return auth.response;
+
+  const { id } = await params;
+  const parsed = parseSongInput(await request.json().catch(() => null));
+  if (!parsed.ok) return badRequest(parsed.error);
+
+  const current = await prisma.song.findFirst({ where: { id, deletedAt: null } });
+  if (!current) return notFound("song");
+
+  if (!contentChanged(current, parsed.data)) {
+    return NextResponse.json({ song: { id, version: current.version } });
+  }
+  const song = await prisma.song.update({
+    where: { id },
+    data: { ...parsed.data, version: { increment: 1 }, updatedById: auth.user.id },
+    select: { id: true, version: true },
+  });
+  return NextResponse.json({ song });
+}
+
+/** DELETE /api/songs/{id}: м'яке видалення (Editor). Копії користувачів лишаються. */
+export async function DELETE(_request: Request, { params }: Context) {
+  const auth = await requireEditor();
+  if ("response" in auth) return auth.response;
+
+  const { id } = await params;
+  const current = await prisma.song.findFirst({ where: { id, deletedAt: null } });
+  if (!current) return notFound("song");
+
+  await prisma.song.update({
+    where: { id },
+    data: { deletedAt: new Date(), updatedById: auth.user.id },
+  });
+  return NextResponse.json({ ok: true });
 }

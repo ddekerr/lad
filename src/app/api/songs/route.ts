@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireEditor } from "@/lib/auth/api";
+import { badRequest } from "@/lib/auth/guard";
 import { prisma } from "@/lib/db";
+import { parseSongInput } from "@/lib/song-input";
 import { catalogWhere } from "@/lib/songs";
 
 export const dynamic = "force-dynamic";
@@ -15,4 +18,19 @@ export async function GET(request: Request) {
   });
 
   return NextResponse.json({ songs });
+}
+
+/** POST /api/songs: додати пісню (Editor). */
+export async function POST(request: Request) {
+  const auth = await requireEditor();
+  if ("response" in auth) return auth.response;
+
+  const parsed = parseSongInput(await request.json().catch(() => null));
+  if (!parsed.ok) return badRequest(parsed.error);
+
+  const song = await prisma.song.create({
+    data: { ...parsed.data, createdById: auth.user.id, updatedById: auth.user.id },
+    select: { id: true },
+  });
+  return NextResponse.json({ song }, { status: 201 });
 }

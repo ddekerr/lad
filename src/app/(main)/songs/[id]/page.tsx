@@ -5,6 +5,7 @@ import { AddToPlaylist } from "@/components/AddToPlaylist";
 import { IconChevronLeft } from "@/components/icons";
 import { SongView } from "@/components/SongView";
 import { prisma } from "@/lib/db";
+import { can } from "@/lib/auth/permissions";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDictionary } from "@/lib/i18n/server";
 import { roleName } from "@/lib/playlists";
@@ -57,7 +58,17 @@ export default async function SongPage({ params }: Props) {
           <IconChevronLeft size={18} />
           {t.song.back}
         </Link>
-        <h1 className="font-heading text-2xl font-bold sm:text-3xl">{song.title}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-heading text-2xl font-bold sm:text-3xl">{song.title}</h1>
+          {user && can(user.actor, "song:write") && (
+            <Link
+              href={`/songs/${song.id}/edit`}
+              className="flex min-h-11 items-center rounded-tile bg-line px-5 font-semibold hover:bg-taupe hover:text-ink"
+            >
+              {t.editor.editSong}
+            </Link>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-3 text-muted">
           <span>{song.artist}</span>
           <span className="rounded-full bg-line px-2.5 py-0.5 text-xs font-semibold text-cream">
