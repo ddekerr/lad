@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { requireMember } from "@/lib/auth/api";
-import { badRequest, forbidden } from "@/lib/auth/guard";
-import { prisma } from "@/lib/db";
-import { cleanPlaylistName, parseRoleFilter } from "@/lib/playlist-input";
+import { cleanPlaylistName, parseRoleFilter } from "@/entities/playlist";
+import { requireMember } from "@/server/auth/api";
+import { badRequest, forbidden } from "@/server/auth/guard";
+import { prisma } from "@/server/db";
 
 export const dynamic = "force-dynamic";
 

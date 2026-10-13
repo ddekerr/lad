@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { badRequest, forbidden, notFound, unauthorized } from "@/lib/auth/guard";
-import { canGrantRole } from "@/lib/auth/permissions";
-import { getCurrentUser } from "@/lib/auth/session";
-import { prisma } from "@/lib/db";
+import { canGrantRole } from "@/entities/user";
+import { badRequest, forbidden, notFound, unauthorized } from "@/server/auth/guard";
+import { getCurrentUser } from "@/server/auth/session";
+import { prisma } from "@/server/db";
 
 export const dynamic = "force-dynamic";
 

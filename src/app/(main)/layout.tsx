@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { LangSwitcher } from "@/components/LangSwitcher";
-import { Logo } from "@/components/Logo";
-import { NavLinks, type NavItem } from "@/components/NavLinks";
-import { can } from "@/lib/auth/permissions";
-import { getCurrentUser } from "@/lib/auth/session";
-import { getDictionary } from "@/lib/i18n/server";
+import { NavLinks, type NavItem } from "@/widgets/app-navigation";
+import { LangSwitcher } from "@/features/change-language";
+import { can } from "@/entities/user";
+import { getCurrentUser } from "@/server/auth/session";
+import { getDictionary } from "@/server/i18n";
+import { Logo } from "@/shared/ui";
 
 /**
  * Оболонка застосунку. Комп'ютер: вузька бічна панель з іконками й верхня смуга.

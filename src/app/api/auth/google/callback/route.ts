@@ -1,10 +1,10 @@
 import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { OAUTH_STATE_COOKIE, appUrl, googleConfig } from "@/lib/auth/config";
-import { normalizeEmail } from "@/lib/auth/crypto";
-import { createSession, setSessionCookie } from "@/lib/auth/session";
-import { findOrCreateUser } from "@/lib/auth/users";
-import { LOCALE_COOKIE } from "@/lib/i18n/dictionaries";
+import { OAUTH_STATE_COOKIE, appUrl, googleConfig } from "@/server/auth/config";
+import { normalizeEmail } from "@/server/auth/crypto";
+import { createSession, setSessionCookie } from "@/server/auth/session";
+import { findOrCreateUser } from "@/server/auth/users";
+import { LOCALE_COOKIE } from "@/shared/i18n";
 
 export const dynamic = "force-dynamic";
 

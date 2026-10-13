@@ -1,10 +1,10 @@
 import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { normalizeCode, normalizeEmail } from "@/lib/auth/crypto";
-import { verifyLoginCode } from "@/lib/auth/login-codes";
-import { createSession, setSessionCookie } from "@/lib/auth/session";
-import { findOrCreateUser } from "@/lib/auth/users";
-import { LOCALE_COOKIE } from "@/lib/i18n/dictionaries";
+import { normalizeCode, normalizeEmail } from "@/server/auth/crypto";
+import { verifyLoginCode } from "@/server/auth/login-codes";
+import { createSession, setSessionCookie } from "@/server/auth/session";
+import { findOrCreateUser } from "@/server/auth/users";
+import { LOCALE_COOKIE } from "@/shared/i18n";
 
 export const dynamic = "force-dynamic";
 

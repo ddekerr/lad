@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { appUrl } from "@/lib/auth/config";
-import { revokeCurrentSession } from "@/lib/auth/session";
+import { appUrl } from "@/server/auth/config";
+import { revokeCurrentSession } from "@/server/auth/session";
 
 export const dynamic = "force-dynamic";
 

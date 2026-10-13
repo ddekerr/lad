@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
-import { prisma } from "@/lib/db";
-import { LOCALE_COOKIE, isLocale } from "@/lib/i18n/dictionaries";
+import { getCurrentUser } from "@/server/auth/session";
+import { prisma } from "@/server/db";
+import { LOCALE_COOKIE, isLocale } from "@/shared/i18n";
 
 export const dynamic = "force-dynamic";
 

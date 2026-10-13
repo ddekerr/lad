@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireMember } from "@/lib/auth/api";
-import { badRequest, notFound } from "@/lib/auth/guard";
-import { copyState } from "@/lib/copies";
-import { prisma } from "@/lib/db";
-import { cleanPlaylistName } from "@/lib/playlist-input";
-import { getOwnedPlaylist } from "@/lib/playlists";
+import { cleanPlaylistName } from "@/entities/playlist";
+import { copyState } from "@/entities/song-copy";
+import { requireMember } from "@/server/auth/api";
+import { badRequest, notFound } from "@/server/auth/guard";
+import { prisma } from "@/server/db";
+import { getOwnedPlaylist } from "@/server/playlists";
 
 export const dynamic = "force-dynamic";
 

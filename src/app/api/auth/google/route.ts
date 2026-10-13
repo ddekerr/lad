@@ -1,7 +1,7 @@
-import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { OAUTH_STATE_COOKIE, appUrl, googleConfig, isProduction } from "@/lib/auth/config";
+import { randomBytes } from "node:crypto";
+import { OAUTH_STATE_COOKIE, appUrl, googleConfig, isProduction } from "@/server/auth/config";
 
 export const dynamic = "force-dynamic";
 

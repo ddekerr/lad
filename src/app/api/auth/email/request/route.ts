@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { normalizeEmail } from "@/lib/auth/crypto";
-import { requestLoginCode } from "@/lib/auth/login-codes";
+import { normalizeEmail } from "@/server/auth/crypto";
+import { requestLoginCode } from "@/server/auth/login-codes";
 
 export const dynamic = "force-dynamic";
 
