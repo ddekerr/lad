@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Onest, Unbounded } from "next/font/google";
-import { getLocale } from "@/lib/i18n/server";
+import { getLocale } from "@/server/i18n";
 import "./globals.css";
 
 const unbounded = Unbounded({

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { requireMember } from "@/lib/auth/api";
-import { notFound } from "@/lib/auth/guard";
-import { prisma } from "@/lib/db";
-import { getOwnedCopy } from "@/lib/playlists";
+import { requireMember } from "@/server/auth/api";
+import { notFound } from "@/server/auth/guard";
+import { prisma } from "@/server/db";
+import { getOwnedCopy } from "@/server/playlists";
 
 export const dynamic = "force-dynamic";
 

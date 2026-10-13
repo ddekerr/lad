@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { badRequest, forbidden, unauthorized } from "@/lib/auth/guard";
-import { can } from "@/lib/auth/permissions";
-import { getCurrentUser } from "@/lib/auth/session";
-import { prisma } from "@/lib/db";
-import { cleanName, isValidRoleKey } from "@/lib/role-input";
+import { cleanName, isValidRoleKey } from "@/entities/role";
+import { can } from "@/entities/user";
+import { badRequest, forbidden, unauthorized } from "@/server/auth/guard";
+import { getCurrentUser } from "@/server/auth/session";
+import { prisma } from "@/server/db";
 
 export const dynamic = "force-dynamic";
 

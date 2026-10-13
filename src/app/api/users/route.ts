@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { forbidden, unauthorized } from "@/lib/auth/guard";
-import { can, isSuperAdminEmail } from "@/lib/auth/permissions";
-import { superAdminEmails } from "@/lib/auth/config";
-import { getCurrentUser } from "@/lib/auth/session";
-import { prisma } from "@/lib/db";
+import { can, isSuperAdminEmail } from "@/entities/user";
+import { superAdminEmails } from "@/server/auth/config";
+import { forbidden, unauthorized } from "@/server/auth/guard";
+import { getCurrentUser } from "@/server/auth/session";
+import { prisma } from "@/server/db";
 
 export const dynamic = "force-dynamic";
 

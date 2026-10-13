@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireEditor } from "@/lib/auth/api";
-import { badRequest } from "@/lib/auth/guard";
-import { prisma } from "@/lib/db";
-import { parseSongInput } from "@/lib/song-input";
-import { catalogWhere } from "@/lib/songs";
+import { parseSongInput } from "@/entities/song";
+import { requireEditor } from "@/server/auth/api";
+import { badRequest } from "@/server/auth/guard";
+import { prisma } from "@/server/db";
+import { catalogWhere } from "@/server/songs";
 
 export const dynamic = "force-dynamic";
 

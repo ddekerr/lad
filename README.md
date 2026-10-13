@@ -20,7 +20,31 @@ npm run dev                   # http://localhost:3000
 
 Перший вхід у розробці: без SMTP код для входу друкується в консоль, де запущено `npm run dev`. Вкажи свою пошту в `SUPER_ADMIN_EMAIL`, увійди нею, і ти отримаєш права адміна й супер-адміна.
 
-Тести: `npm test`. Типи: `npm run typecheck`.
+Тести: `npm test`. Типи: `npm run typecheck`. Межі архітектури: `npm run lint`.
+
+## Архітектура
+
+Увесь код лежить у `src/` і організований за [Feature-Sliced Design](https://feature-sliced.design). Шари йдуть зверху вниз, кожен імпортує лише з шарів нижче.
+
+| Шар | Що там |
+|---|---|
+| `app` | Роути Next (App Router): тонкі `page.tsx` з реекспортом зі `views`, `layout.tsx`, `api/**/route.ts`, `globals.css` з токенами брендбука |
+| `views` | Екрани (назва `views` замість `pages`, щоб не конфліктувати з Next): `catalog`, `song`, `song-editor`, `copy`, `playlists`, `playlist`, `profile`, `sign-in`, `users-roles`, `stage` |
+| `widgets` | Великі самодостатні блоки: `song-viewer`, `copy-editor`, `playlist-view`, `song-editor`, `stage-mode`, `users-admin`, `music-roles-admin`, `app-navigation` |
+| `features` | Дії користувача: `sign-in`, `change-language`, `add-song-to-playlist`, `create-playlist` |
+| `entities` | Предметні сутності й чиста логіка: `song`, `song-copy`, `playlist`, `role`, `user` (матриця прав) |
+| `shared` | `ui` (іконки, логотип), `lib/chords` (розбір і транспонування акордів), `i18n` (словники EN/UK) |
+| `server` | Поза FSD: БД (Prisma), сесії й автентифікація, пошта, запити до БД |
+
+Правила, які перевіряє `eslint-plugin-boundaries` (`eslint.config.mjs`):
+
+- слайси одного шару не імпортують один одного;
+- слайс доступний ззовні лише через свій `index.ts`;
+- `server` можуть імпортувати `app`, `views` і `features` (серверні дії); `widgets`, `entities` і `shared` ні;
+- `server` залежить лише від `entities` і `shared`;
+- у `src/app/**/page.tsx` лишається тільки реекспорт зі `views` і `export const dynamic`: Next не дозволяє реекспортувати налаштування сегмента.
+
+Юніт-тести лежать поруч із кодом (`*.test.ts`). Наскрізні тести (Playwright) ведуться окремо від застосунку.
 
 ## Статус
 
@@ -41,5 +65,5 @@ npm run dev                   # http://localhost:3000
 
 ## Примітки
 
-- Транспонування акордів (`src/lib/chords`), права (`src/lib/auth/permissions.ts`), хеші кодів і словники покриті тестами.
+- Транспонування акордів (`src/shared/lib/chords`), права (`src/entities/user/model/permissions.ts`), хеші кодів і словники покриті тестами.
 - Код написано без запуску Next.js і Prisma (у середовищі розробки був закритий npm), тому перший `npm install`, `migrate` і `dev` можуть виявити дрібні помилки.
