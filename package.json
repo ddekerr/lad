@@ -4,7 +4,7 @@
   "private": true,
   "description": "Лад: застосунок для музикантів (пісні, акорди, плейлисти)",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",

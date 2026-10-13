@@ -13,7 +13,6 @@ Next.js (App Router, TypeScript), Tailwind CSS 4, PostgreSQL + Prisma, nodemaile
 ```bash
 npm install
 cp .env.example .env          # заповни AUTH_SECRET і SUPER_ADMIN_EMAIL
-docker compose up -d          # PostgreSQL на порту 5432
 npx prisma migrate dev --name init
 npm run db:seed               # ролі й три демо-пісні
 npm run dev                   # http://localhost:3000
