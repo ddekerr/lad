@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { fmt, type Dictionary } from "@/shared/i18n";
-import { IconWarning } from "@/shared/ui";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { fmt, type Dictionary } from '@/shared/i18n';
+import { IconWarning } from '@/shared/ui';
 
 export type AdminRole = {
   id: string;
   key: string;
-  kind: "system" | "music";
+  kind: 'system' | 'music';
   /** Назва мовою інтерфейсу */
   name: string;
 };
@@ -31,7 +31,7 @@ type Props = {
 
 type Pending = { role: AdminRole; playlists: number; copies: number };
 
-const buttonBase = "min-h-11 rounded-tile px-5 font-semibold disabled:opacity-60";
+const buttonBase = 'min-h-11 rounded-tile px-5 font-semibold disabled:opacity-60';
 
 /** Список користувачів: розкрити картку, відмітити ролі, зберегти. */
 export function UsersAdmin({ users, roles, memberRoleName, actorIsSuper, t }: Props) {
@@ -63,12 +63,12 @@ function UserCard({
   t,
   open,
   onToggle,
-}: Omit<Props, "users"> & { user: AdminUser; open: boolean; onToggle: () => void }) {
+}: Omit<Props, 'users'> & { user: AdminUser; open: boolean; onToggle: () => void }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set(user.roleIds));
   const [pending, setPending] = useState<Pending[] | null>(null);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
 
   const original = new Set(user.roleIds);
   const toAdd = roles.filter((r) => selected.has(r.id) && !original.has(r.id));
@@ -77,7 +77,7 @@ function UserCard({
 
   /** Чи можна змінювати цю роль: роль Admin лише для супер-адміна, і не в самого супер-адміна. */
   function lockReason(role: AdminRole): string | null {
-    if (role.key !== "admin") return null;
+    if (role.key !== 'admin') return null;
     if (user.isSuperAdmin) return t.admin.superAdminLocked;
     if (!actorIsSuper) return t.admin.adminSuperOnlyHint;
     return null;
@@ -99,23 +99,23 @@ function UserCard({
     try {
       for (const role of toAdd) {
         const response = await fetch(`/api/users/${user.id}/roles`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ roleId: role.id }),
         });
-        if (!response.ok) throw new Error("grant_failed");
+        if (!response.ok) throw new Error('grant_failed');
       }
       for (const role of toRemove) {
         const response = await fetch(`/api/users/${user.id}/roles/${role.id}`, {
-          method: "DELETE",
+          method: 'DELETE',
         });
-        if (!response.ok) throw new Error("revoke_failed");
+        if (!response.ok) throw new Error('revoke_failed');
       }
       setPending(null);
-      setMessage({ kind: "ok", text: t.admin.saved });
+      setMessage({ kind: 'ok', text: t.admin.saved });
       router.refresh();
     } catch {
-      setMessage({ kind: "error", text: t.admin.failed });
+      setMessage({ kind: 'error', text: t.admin.failed });
     } finally {
       setBusy(false);
     }
@@ -123,7 +123,7 @@ function UserCard({
 
   /** Перед зняттям музичної ролі показуємо, скільки плейлистів і копій буде видалено. */
   async function save() {
-    const musicRemovals = toRemove.filter((r) => r.kind === "music");
+    const musicRemovals = toRemove.filter((r) => r.kind === 'music');
     if (musicRemovals.length === 0) {
       await apply();
       return;
@@ -133,7 +133,7 @@ function UserCard({
       const list: Pending[] = [];
       for (const role of musicRemovals) {
         const response = await fetch(`/api/users/${user.id}/roles/${role.id}/impact`);
-        if (!response.ok) throw new Error("impact_failed");
+        if (!response.ok) throw new Error('impact_failed');
         const data = (await response.json()) as {
           impact: { playlists: number; copies: number };
         };
@@ -141,7 +141,7 @@ function UserCard({
       }
       setPending(list);
     } catch {
-      setMessage({ kind: "error", text: t.admin.failed });
+      setMessage({ kind: 'error', text: t.admin.failed });
     } finally {
       setBusy(false);
     }
@@ -150,23 +150,14 @@ function UserCard({
   const currentNames = roles.filter((r) => original.has(r.id)).map((r) => r.name);
 
   return (
-    <li
-      className={
-        "rounded-[16px] bg-surface p-4 " + (open ? "border border-amber" : "border border-transparent")
-      }
-    >
+    <li className={'rounded-2xl bg-surface p-4 ' + (open ? 'border border-amber' : 'border border-transparent')}>
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
           <div className="truncate font-semibold">{user.email}</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            <span className="rounded-full bg-amber px-2.5 py-0.5 text-xs font-semibold text-ink">
-              {memberRoleName}
-            </span>
+            <span className="rounded-full bg-amber px-2.5 py-0.5 text-xs font-semibold text-ink">{memberRoleName}</span>
             {currentNames.map((name) => (
-              <span
-                key={name}
-                className="rounded-full bg-line px-2.5 py-0.5 text-xs font-semibold"
-              >
+              <span key={name} className="rounded-full bg-line px-2.5 py-0.5 text-xs font-semibold">
                 {name}
               </span>
             ))}
@@ -255,10 +246,7 @@ function UserCard({
                 {busy ? t.admin.saving : t.admin.save}
               </button>
               {message && (
-                <span
-                  role="status"
-                  className={message.kind === "ok" ? "text-sm text-success" : "text-sm text-danger"}
-                >
+                <span role="status" className={message.kind === 'ok' ? 'text-sm text-success' : 'text-sm text-danger'}>
                   {message.text}
                 </span>
               )}

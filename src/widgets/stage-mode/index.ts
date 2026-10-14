@@ -1,1 +1,1 @@
-export { StageClient } from "./ui/StageClient";
+export { StageClient } from './ui/stage-client';

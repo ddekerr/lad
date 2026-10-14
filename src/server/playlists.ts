@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma } from './db';
 
 /** Плейлист, який належить користувачу, або null (чужі плейлисти для API не існують). */
 export function getOwnedPlaylist(userId: string, id: string) {
@@ -22,9 +22,9 @@ export function getOwnedCopy(userId: string, id: string) {
 /** Музичні ролі користувача: з них він вибирає контекст плейлистів. */
 export async function getUserMusicRoles(userId: string) {
   const rows = await prisma.userRole.findMany({
-    where: { userId, role: { kind: "music" } },
+    where: { userId, role: { kind: 'music' } },
     select: { role: { select: { id: true, key: true, nameEn: true, nameUk: true } } },
-    orderBy: { role: { key: "asc" } },
+    orderBy: { role: { key: 'asc' } },
   });
   return rows.map((r) => r.role);
 }

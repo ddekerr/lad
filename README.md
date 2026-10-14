@@ -26,15 +26,15 @@ npm run dev                   # http://localhost:3000
 
 Увесь код лежить у `src/` і організований за [Feature-Sliced Design](https://feature-sliced.design). Шари йдуть зверху вниз, кожен імпортує лише з шарів нижче.
 
-| Шар | Що там |
-|---|---|
-| `app` | Роути Next (App Router): тонкі `page.tsx` з реекспортом зі `views`, `layout.tsx`, `api/**/route.ts`, `globals.css` з токенами брендбука |
-| `views` | Екрани (назва `views` замість `pages`, щоб не конфліктувати з Next): `catalog`, `song`, `song-editor`, `copy`, `playlists`, `playlist`, `profile`, `sign-in`, `users-roles`, `stage` |
-| `widgets` | Великі самодостатні блоки: `song-viewer`, `copy-editor`, `playlist-view`, `song-editor`, `stage-mode`, `users-admin`, `music-roles-admin`, `app-navigation` |
-| `features` | Дії користувача: `sign-in`, `change-language`, `add-song-to-playlist`, `create-playlist` |
-| `entities` | Предметні сутності й чиста логіка: `song`, `song-copy`, `playlist`, `role`, `user` (матриця прав) |
-| `shared` | `ui` (іконки, логотип), `lib/chords` (розбір і транспонування акордів), `i18n` (словники EN/UK) |
-| `server` | Поза FSD: БД (Prisma), сесії й автентифікація, пошта, запити до БД |
+| Шар        | Що там                                                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app`      | Роути Next (App Router): тонкі `page.tsx` з реекспортом зі `views`, `layout.tsx`, `api/**/route.ts`, `globals.css` з токенами брендбука                                              |
+| `views`    | Екрани (назва `views` замість `pages`, щоб не конфліктувати з Next): `catalog`, `song`, `song-editor`, `copy`, `playlists`, `playlist`, `profile`, `sign-in`, `users-roles`, `stage` |
+| `widgets`  | Великі самодостатні блоки: `song-viewer`, `copy-editor`, `playlist-view`, `song-editor`, `stage-mode`, `users-admin`, `music-roles-admin`, `app-navigation`                          |
+| `features` | Дії користувача: `sign-in`, `change-language`, `add-song-to-playlist`, `create-playlist`                                                                                             |
+| `entities` | Предметні сутності й чиста логіка: `song`, `song-copy`, `playlist`, `role`, `user` (матриця прав)                                                                                    |
+| `shared`   | `ui` (іконки, логотип), `lib/chords` (розбір і транспонування акордів), `i18n` (словники EN/UK)                                                                                      |
+| `server`   | Поза FSD: БД (Prisma), сесії й автентифікація, пошта, запити до БД                                                                                                                   |
 
 Правила, які перевіряє `eslint-plugin-boundaries` (`eslint.config.mjs`):
 

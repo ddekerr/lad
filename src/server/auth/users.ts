@@ -1,21 +1,17 @@
-import { Prisma, type AuthProvider } from "@prisma/client";
-import { ROLE_MEMBER } from "@/entities/user";
-import { prisma } from "@/server/db";
+import { Prisma, type AuthProvider } from '@prisma/client';
+import { ROLE_MEMBER } from '@/entities/user';
+import { prisma } from '@/server/db';
 
 /**
  * Реєстрація й вхід це один потік: якщо акаунта з таким email немає, він
  * створюється з роллю Member. Google та email з однаковою адресою ведуть в один акаунт.
  */
-export async function findOrCreateUser(
-  email: string,
-  provider: AuthProvider,
-  providerUserId: string | null,
-) {
+export async function findOrCreateUser(email: string, provider: AuthProvider, providerUserId: string | null) {
   try {
     return await upsertUser(email, provider, providerUserId);
   } catch (error) {
     // Два одночасні входи нового користувача: другий отримає конфлікт унікальності
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       return await upsertUser(email, provider, providerUserId);
     }
     throw error;

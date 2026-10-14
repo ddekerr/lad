@@ -1,7 +1,7 @@
-import type { NextResponse } from "next/server";
-import { can } from "@/entities/user";
-import { forbidden, unauthorized } from "./guard";
-import { getCurrentUser, type CurrentUser } from "./session";
+import type { NextResponse } from 'next/server';
+import { can } from '@/entities/user';
+import { forbidden, unauthorized } from './guard';
+import { getCurrentUser, type CurrentUser } from './session';
 
 export type MemberResult = { user: CurrentUser } | { response: NextResponse };
 
@@ -9,7 +9,7 @@ export type MemberResult = { user: CurrentUser } | { response: NextResponse };
 export async function requireMember(): Promise<MemberResult> {
   const user = await getCurrentUser();
   if (!user) return { response: unauthorized() };
-  if (!can(user.actor, "playlist:manage")) return { response: forbidden() };
+  if (!can(user.actor, 'playlist:manage')) return { response: forbidden() };
   return { user };
 }
 
@@ -17,6 +17,6 @@ export async function requireMember(): Promise<MemberResult> {
 export async function requireEditor(): Promise<MemberResult> {
   const user = await getCurrentUser();
   if (!user) return { response: unauthorized() };
-  if (!can(user.actor, "song:write")) return { response: forbidden() };
+  if (!can(user.actor, 'song:write')) return { response: forbidden() };
   return { user };
 }

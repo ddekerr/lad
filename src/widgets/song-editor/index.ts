@@ -1,1 +1,1 @@
-export { SongEditor } from "./ui/SongEditor";
+export { SongEditor } from './ui/song-editor';

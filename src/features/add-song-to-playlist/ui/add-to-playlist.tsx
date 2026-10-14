@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState } from "react";
-import type { Dictionary } from "@/shared/i18n";
+import Link from 'next/link';
+import { useState } from 'react';
+import type { Dictionary } from '@/shared/i18n';
 
 type Props = {
   songId: string;
@@ -13,9 +13,9 @@ type Props = {
 
 /** Додає пісню в обраний плейлист: кожне додавання створює нову незалежну копію. */
 export function AddToPlaylist({ songId, playlists, t }: Props) {
-  const [playlistId, setPlaylistId] = useState(playlists?.[0]?.id ?? "");
+  const [playlistId, setPlaylistId] = useState(playlists?.[0]?.id ?? '');
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<{ copyId: string } | "error" | null>(null);
+  const [result, setResult] = useState<{ copyId: string } | 'error' | null>(null);
 
   if (playlists === null) {
     return (
@@ -31,7 +31,7 @@ export function AddToPlaylist({ songId, playlists, t }: Props) {
   if (playlists.length === 0) {
     return (
       <p className="text-sm text-muted">
-        {t.song.noPlaylists}{" "}
+        {t.song.noPlaylists}{' '}
         <Link href="/playlists" className="text-amber underline underline-offset-4">
           {t.song.createPlaylist}
         </Link>
@@ -43,12 +43,12 @@ export function AddToPlaylist({ songId, playlists, t }: Props) {
     setBusy(true);
     setResult(null);
     const res = await fetch(`/api/playlists/${playlistId}/songs`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ songId }),
     }).catch(() => null);
     setBusy(false);
-    if (!res?.ok) return setResult("error");
+    if (!res?.ok) return setResult('error');
     const data = (await res.json()) as { copy: { id: string } };
     setResult({ copyId: data.copy.id });
   }
@@ -79,10 +79,10 @@ export function AddToPlaylist({ songId, playlists, t }: Props) {
         {t.song.addButton}
       </button>
       <div aria-live="polite" className="text-sm">
-        {result === "error" && <span className="text-danger">{t.playlists.failed}</span>}
-        {result && result !== "error" && (
+        {result === 'error' && <span className="text-danger">{t.playlists.failed}</span>}
+        {result && result !== 'error' && (
           <span className="text-success">
-            {t.song.added}{" "}
+            {t.song.added}{' '}
             <Link href={`/copies/${result.copyId}`} className="underline underline-offset-4">
               {t.song.openCopy}
             </Link>

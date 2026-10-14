@@ -22,7 +22,7 @@ export function parseLine(raw: string): Line {
   for (const match of raw.matchAll(CHORD_RE)) {
     const index = match.index ?? 0;
     const text = raw.slice(last, index);
-    if (text !== "" || pending !== null) {
+    if (text !== '' || pending !== null) {
       segments.push({ chord: pending, text });
     }
     pending = match[1].trim();
@@ -30,7 +30,7 @@ export function parseLine(raw: string): Line {
   }
 
   const tail = raw.slice(last);
-  if (tail !== "" || pending !== null) {
+  if (tail !== '' || pending !== null) {
     segments.push({ chord: pending, text: tail });
   }
   return segments;
@@ -38,12 +38,12 @@ export function parseLine(raw: string): Line {
 
 /** Розбирає всю пісню на рядки. Порожні рядки зберігаються як відступи. */
 export function parseSong(body: string): Line[] {
-  return body.replace(/\r\n?/g, "\n").split("\n").map(parseLine);
+  return body.replace(/\r\n?/g, '\n').split('\n').map(parseLine);
 }
 
 /** Лише текст рядка, без акордів. */
 export function lineText(line: Line): string {
-  return line.map((s) => s.text).join("");
+  return line.map((s) => s.text).join('');
 }
 
 /** Лише акорди рядка у порядку появи. */

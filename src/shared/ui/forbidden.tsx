@@ -1,5 +1,5 @@
-import Link from "next/link";
-import type { Dictionary } from "@/shared/i18n";
+import Link from 'next/link';
+import type { Dictionary } from '@/shared/i18n';
 
 /** Сторінка «немає доступу» для користувача без потрібної ролі. */
 export function Forbidden({ t }: { t: Dictionary }) {

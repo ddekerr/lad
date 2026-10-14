@@ -1,19 +1,13 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import type { Dictionary } from "@/shared/i18n";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import type { Dictionary } from '@/shared/i18n';
 
 /** Форма нового плейлиста у поточному контексті ролі (musicRoleId = null означає «без ролі»). */
-export function PlaylistCreateForm({
-  musicRoleId,
-  t,
-}: {
-  musicRoleId: string | null;
-  t: Dictionary;
-}) {
+export function PlaylistCreateForm({ musicRoleId, t }: { musicRoleId: string | null; t: Dictionary }) {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
 
@@ -22,14 +16,14 @@ export function PlaylistCreateForm({
     if (!name.trim()) return;
     setBusy(true);
     setError(false);
-    const res = await fetch("/api/playlists", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    const res = await fetch('/api/playlists', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ name, musicRoleId }),
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) return setError(true);
-    setName("");
+    setName('');
     router.refresh();
   }
 

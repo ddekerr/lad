@@ -1,30 +1,30 @@
-import type { Metadata, Viewport } from "next";
-import { Onest, Unbounded } from "next/font/google";
-import { getLocale } from "@/server/i18n";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Onest, Unbounded } from 'next/font/google';
+import { getLocale } from '@/server/i18n';
+import './globals.css';
 
 const unbounded = Unbounded({
-  subsets: ["latin", "cyrillic"],
-  weight: ["500", "700"],
-  variable: "--font-unbounded",
-  display: "swap",
+  subsets: ['latin', 'cyrillic'],
+  weight: ['500', '700'],
+  variable: '--font-unbounded',
+  display: 'swap',
 });
 
 const onest = Onest({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600"],
-  variable: "--font-onest",
-  display: "swap",
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600'],
+  variable: '--font-onest',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: { default: "Лад", template: "%s · Лад" },
-  description: "Пісні й акорди для музикантів",
+  title: { default: 'Лад', template: '%s · Лад' },
+  description: 'Пісні й акорди для музикантів',
 };
 
 export const viewport: Viewport = {
-  themeColor: "#333333",
-  width: "device-width",
+  themeColor: '#333333',
+  width: 'device-width',
   initialScale: 1,
 };
 

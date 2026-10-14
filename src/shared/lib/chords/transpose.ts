@@ -4,8 +4,8 @@
  * риски (C/E). Невпізнаний акорд повертається без змін.
  */
 
-const SHARP_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-const FLAT_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 const LETTER_INDEX: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
 /** Тональності, які записують із бемолями (за індексом ноти). */
@@ -22,8 +22,8 @@ function mod12(n: number): number {
 
 function noteIndex(letter: string, accidental: string): number {
   let index = LETTER_INDEX[letter];
-  if (accidental === "#") index += 1;
-  if (accidental === "b") index -= 1;
+  if (accidental === '#') index += 1;
+  if (accidental === 'b') index -= 1;
   return mod12(index);
 }
 
@@ -51,7 +51,7 @@ export function transposeKey(key: string, semitones: number): string {
   if (!parsed) return key;
   const index = mod12(parsed.index + semitones);
   const flats = keyUsesFlats({ index, minor: parsed.minor });
-  return noteName(index, flats) + (parsed.minor ? "m" : "");
+  return noteName(index, flats) + (parsed.minor ? 'm' : '');
 }
 
 /**
@@ -72,8 +72,6 @@ export function transposeChord(chord: string, semitones: number, preferFlats = f
   if (!QUALITY_RE.test(quality)) return chord;
 
   const root = noteName(noteIndex(rootLetter, rootAccidental) + semitones, preferFlats);
-  const bass = bassLetter
-    ? "/" + noteName(noteIndex(bassLetter, bassAccidental) + semitones, preferFlats)
-    : "";
+  const bass = bassLetter ? '/' + noteName(noteIndex(bassLetter, bassAccidental) + semitones, preferFlats) : '';
   return root + quality + bass;
 }

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-import { fmt, type Dictionary } from "@/shared/i18n";
-import { IconWarning } from "@/shared/ui";
+import { useRouter } from 'next/navigation';
+import { useState, type FormEvent } from 'react';
+import { fmt, type Dictionary } from '@/shared/i18n';
+import { IconWarning } from '@/shared/ui';
 
 export type MusicRoleRow = { id: string; key: string; name: string; nameEn: string; nameUk: string };
 
@@ -12,14 +12,14 @@ type Props = { roles: MusicRoleRow[]; t: Dictionary };
 type Impact = { users: number; playlists: number; copies: number };
 
 const inputClass =
-  "h-12 w-full rounded-tile border border-line bg-ink px-3.5 text-base text-cream placeholder:text-dim";
+  'h-12 w-full rounded-tile border border-line bg-ink px-3.5 text-base text-cream placeholder:text-dim';
 
 /** Довідник музичних ролей: додати, видалити (з підтвердженням і підрахунком наслідків). Лише супер-адмін. */
 export function MusicRolesAdmin({ roles, t }: Props) {
   const router = useRouter();
-  const [key, setKey] = useState("");
-  const [nameEn, setNameEn] = useState("");
-  const [nameUk, setNameUk] = useState("");
+  const [key, setKey] = useState('');
+  const [nameEn, setNameEn] = useState('');
+  const [nameUk, setNameUk] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<{ role: MusicRoleRow; impact: Impact } | null>(null);
@@ -29,25 +29,25 @@ export function MusicRolesAdmin({ roles, t }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const response = await fetch("/api/roles", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
+      const response = await fetch('/api/roles', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ key, nameEn, nameUk }),
       });
       if (response.ok) {
-        setKey("");
-        setNameEn("");
-        setNameUk("");
+        setKey('');
+        setNameEn('');
+        setNameUk('');
         router.refresh();
         return;
       }
       const data = (await response.json().catch(() => ({}))) as { error?: string };
       setError(
-        data.error === "key_taken"
+        data.error === 'key_taken'
           ? t.admin.keyTaken
-          : data.error === "invalid_key"
+          : data.error === 'invalid_key'
             ? t.admin.invalidKey
-            : data.error === "invalid_name"
+            : data.error === 'invalid_name'
               ? t.admin.invalidName
               : t.admin.failed,
       );
@@ -63,7 +63,7 @@ export function MusicRolesAdmin({ roles, t }: Props) {
     setError(null);
     try {
       const response = await fetch(`/api/roles/${role.id}/impact`);
-      if (!response.ok) throw new Error("impact_failed");
+      if (!response.ok) throw new Error('impact_failed');
       const data = (await response.json()) as { impact: Impact };
       setConfirm({ role, impact: data.impact });
     } catch {
@@ -77,8 +77,8 @@ export function MusicRolesAdmin({ roles, t }: Props) {
     if (!confirm) return;
     setBusy(true);
     try {
-      const response = await fetch(`/api/roles/${confirm.role.id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("delete_failed");
+      const response = await fetch(`/api/roles/${confirm.role.id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('delete_failed');
       setConfirm(null);
       router.refresh();
     } catch {
@@ -98,7 +98,7 @@ export function MusicRolesAdmin({ roles, t }: Props) {
 
       <ul className="flex flex-col gap-2">
         {roles.map((role) => (
-          <li key={role.id} className="flex items-center gap-3 rounded-[16px] bg-surface px-4 py-3">
+          <li key={role.id} className="flex items-center gap-3 rounded-2xl bg-surface px-4 py-3">
             <div className="min-w-0 flex-1">
               <div className="font-semibold">{role.name}</div>
               <div className="truncate text-sm text-muted">

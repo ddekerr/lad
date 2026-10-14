@@ -1,12 +1,5 @@
-import { cookies } from "next/headers";
-import {
-  DEFAULT_LOCALE,
-  Dictionary,
-  LOCALE_COOKIE,
-  Locale,
-  dictionaries,
-  isLocale,
-} from "@/shared/i18n";
+import { cookies } from 'next/headers';
+import { DEFAULT_LOCALE, Dictionary, LOCALE_COOKIE, Locale, dictionaries, isLocale } from '@/shared/i18n';
 
 /** Мова інтерфейсу з cookie; англійська за замовчуванням. */
 export async function getLocale(): Promise<Locale> {

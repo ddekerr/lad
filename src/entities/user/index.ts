@@ -1,1 +1,1 @@
-export * from "./model/permissions";
+export * from './model/permissions';

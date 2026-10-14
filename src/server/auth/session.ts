@@ -1,14 +1,14 @@
-import { cookies } from "next/headers";
-import { cache } from "react";
-import { ROLE_ADMIN, ROLE_MEMBER, isSuperAdminEmail, type Actor } from "@/entities/user";
-import { prisma } from "@/server/db";
-import { SESSION_COOKIE, SESSION_TTL_MS, isProduction, superAdminEmails } from "./config";
-import { generateSessionToken, hashSessionToken } from "./crypto";
+import { cookies } from 'next/headers';
+import { cache } from 'react';
+import { ROLE_ADMIN, ROLE_MEMBER, isSuperAdminEmail, type Actor } from '@/entities/user';
+import { prisma } from '@/server/db';
+import { SESSION_COOKIE, SESSION_TTL_MS, isProduction, superAdminEmails } from './config';
+import { generateSessionToken, hashSessionToken } from './crypto';
 
 export type CurrentUser = {
   id: string;
   email: string;
-  language: "en" | "uk";
+  language: 'en' | 'uk';
   /** Ключі ролей. Member є завжди; для супер-адміна додано admin */
   roles: string[];
   isSuperAdmin: boolean;
@@ -19,7 +19,7 @@ export type CurrentUser = {
 export function buildCurrentUser(user: {
   id: string;
   email: string;
-  language: "en" | "uk";
+  language: 'en' | 'uk';
   roleKeys: string[];
 }): CurrentUser {
   const isSuperAdmin = isSuperAdminEmail(user.email, superAdminEmails());
@@ -56,8 +56,8 @@ export async function setSessionCookie(token: string, expiresAt: Date) {
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "lax",
-    path: "/",
+    sameSite: 'lax',
+    path: '/',
     expires: expiresAt,
   });
 }

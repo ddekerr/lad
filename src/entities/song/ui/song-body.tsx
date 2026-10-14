@@ -1,7 +1,7 @@
-import { Fragment } from "react";
-import { lineChords, lineText, parseSong, transposeChord } from "@/shared/lib/chords";
+import { Fragment } from 'react';
+import { lineChords, lineText, parseSong, transposeChord } from '@/shared/lib/chords';
 
-export type DisplayMode = "text" | "chords" | "both";
+export type DisplayMode = 'text' | 'chords' | 'both';
 
 type Props = {
   body: string;
@@ -29,7 +29,7 @@ export function SongBody({ body, mode, shift, preferFlats, textSize = 20 }: Prop
           return <div key={i} aria-hidden="true" style={{ height: textSize * 0.6 }} />;
         }
 
-        if (mode === "text") {
+        if (mode === 'text') {
           return (
             <div key={i} className="whitespace-pre-wrap">
               {lineText(line)}
@@ -37,16 +37,12 @@ export function SongBody({ body, mode, shift, preferFlats, textSize = 20 }: Prop
           );
         }
 
-        if (mode === "chords") {
+        if (mode === 'chords') {
           const chords = lineChords(line).map(move);
           if (chords.length === 0) return null;
           return (
-            <div
-              key={i}
-              className="font-bold text-amber"
-              style={{ fontSize: chordSize + 4, wordSpacing: "0.6em" }}
-            >
-              {chords.join(" ")}
+            <div key={i} className="font-bold text-amber" style={{ fontSize: chordSize + 4, wordSpacing: '0.6em' }}>
+              {chords.join(' ')}
             </div>
           );
         }
@@ -60,9 +56,9 @@ export function SongBody({ body, mode, shift, preferFlats, textSize = 20 }: Prop
                     className="font-bold text-amber"
                     style={{ fontSize: chordSize, lineHeight: 1.3, minHeight: chordSize * 1.3 }}
                   >
-                    {segment.chord ? move(segment.chord) : " "}
+                    {segment.chord ? move(segment.chord) : ' '}
                   </span>
-                  <span className="whitespace-pre">{segment.text || " "}</span>
+                  <span className="whitespace-pre">{segment.text || ' '}</span>
                 </span>
               </Fragment>
             ))}

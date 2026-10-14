@@ -1,5 +1,5 @@
-import { LOCALES, type Dictionary, type Locale } from "@/shared/i18n";
-import { setLocale } from "../api/set-locale";
+import { LOCALES, type Dictionary, type Locale } from '@/shared/i18n';
+import { setLocale } from '../api/set-locale';
 
 /** Перемикач EN / UK. Працює через server action, тож без клієнтського JavaScript. */
 export function LangSwitcher({ locale, t }: { locale: Locale; t: Dictionary }) {
@@ -21,8 +21,8 @@ export function LangSwitcher({ locale, t }: { locale: Locale; t: Dictionary }) {
             aria-pressed={active}
             aria-label={t.language[code]}
             className={
-              "h-8 min-w-10 rounded-[8px] px-2 text-sm font-semibold uppercase " +
-              (active ? "bg-amber text-ink" : "text-muted hover:text-cream")
+              'h-8 min-w-10 rounded-lg px-2 text-sm font-semibold uppercase ' +
+              (active ? 'bg-amber text-ink' : 'text-muted hover:text-cream')
             }
           >
             {code}

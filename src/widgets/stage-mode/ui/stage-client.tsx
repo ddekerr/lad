@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { SongBody } from "@/entities/song";
-import type { Dictionary } from "@/shared/i18n";
-import { shouldPreferFlats, transposeKey } from "@/shared/lib/chords";
-import { IconChevronLeft, IconChevronRight, IconClose, IconMinus, IconPause, IconPlay, IconPlus } from "@/shared/ui";
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { SongBody } from '@/entities/song';
+import type { Dictionary } from '@/shared/i18n';
+import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
+import { IconChevronLeft, IconChevronRight, IconClose, IconMinus, IconPause, IconPlay, IconPlus } from '@/shared/ui';
 
 type Props = {
   title: string;
@@ -80,18 +80,18 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
     let lock: WakeLockSentinel | null = null;
     const request = async () => {
       try {
-        if ("wakeLock" in navigator) lock = await navigator.wakeLock.request("screen");
+        if ('wakeLock' in navigator) lock = await navigator.wakeLock.request('screen');
       } catch {
         // старий браузер або вкладка неактивна: просто без блокування
       }
     };
     const onVisibility = () => {
-      if (document.visibilityState === "visible") void request();
+      if (document.visibilityState === 'visible') void request();
     };
     void request();
-    document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
-      document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener('visibilitychange', onVisibility);
       lock?.release().catch(() => undefined);
     };
   }, []);
@@ -102,8 +102,7 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
   }, []);
 
   const barClass =
-    "flex-none transition-opacity duration-300 " +
-    (barsVisible ? "opacity-100" : "pointer-events-none opacity-0");
+    'flex-none transition-opacity duration-300 ' + (barsVisible ? 'opacity-100' : 'pointer-events-none opacity-0');
 
   return (
     <div className="fixed inset-0 flex flex-col bg-ink text-cream">
@@ -114,7 +113,7 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
           <Link
             href={backHref}
             aria-label={t.stage.close}
-            className="flex size-11 flex-none items-center justify-center rounded-[12px] bg-line"
+            className="flex size-11 flex-none items-center justify-center rounded-xl bg-line"
           >
             <IconClose size={22} />
           </Link>
@@ -127,7 +126,7 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
               type="button"
               aria-label={t.stage.smaller}
               onClick={() => setSize((s) => Math.max(MIN_SIZE, s - 4))}
-              className="size-11 rounded-[12px] bg-taupe font-bold text-ink"
+              className="size-11 rounded-xl bg-taupe font-bold text-ink"
             >
               A−
             </button>
@@ -135,7 +134,7 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
               type="button"
               aria-label={t.stage.larger}
               onClick={() => setSize((s) => Math.min(MAX_SIZE, s + 4))}
-              className="size-11 rounded-[12px] bg-taupe text-lg font-bold text-ink"
+              className="size-11 rounded-xl bg-taupe text-lg font-bold text-ink"
             >
               A+
             </button>
@@ -145,13 +144,13 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
               type="button"
               aria-label={t.stage.transposeDown}
               onClick={() => step(-1)}
-              className="flex size-11 items-center justify-center rounded-[12px] bg-taupe text-ink"
+              className="flex size-11 items-center justify-center rounded-xl bg-taupe text-ink"
             >
               <IconMinus size={20} />
             </button>
             <div
               aria-live="polite"
-              className="flex h-11 min-w-12 items-center justify-center rounded-[12px] bg-surface px-2 font-heading font-bold"
+              className="flex h-11 min-w-12 items-center justify-center rounded-xl bg-surface px-2 font-heading font-bold"
             >
               {currentKey}
             </div>
@@ -159,7 +158,7 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
               type="button"
               aria-label={t.stage.transposeUp}
               onClick={() => step(1)}
-              className="flex size-11 items-center justify-center rounded-[12px] bg-taupe text-ink"
+              className="flex size-11 items-center justify-center rounded-xl bg-taupe text-ink"
             >
               <IconPlus size={20} />
             </button>
@@ -167,30 +166,18 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
         </div>
       </header>
 
-      <main
-        ref={scrollRef}
-        onClick={onTapText}
-        className="flex-1 cursor-pointer overflow-y-auto px-4 py-8 sm:px-12"
-      >
+      <main ref={scrollRef} onClick={onTapText} className="flex-1 cursor-pointer overflow-y-auto px-4 py-8 sm:px-12">
         <div className="mx-auto max-w-4xl pb-[60vh]">
-          <SongBody
-            body={body}
-            mode="both"
-            shift={shift}
-            preferFlats={preferFlats}
-            textSize={size}
-          />
+          <SongBody body={body} mode="both" shift={shift} preferFlats={preferFlats} textSize={size} />
         </div>
       </main>
 
-      <footer
-        className={`${barClass} flex min-h-20 items-center justify-center gap-5 border-t border-line px-4`}
-      >
+      <footer className={`${barClass} flex min-h-20 items-center justify-center gap-5 border-t border-line px-4`}>
         {prev && (
           <Link
             href={prev.href}
             aria-label={`${t.stage.prev}: ${prev.title}`}
-            className="flex size-12 flex-none items-center justify-center rounded-[12px] bg-line"
+            className="flex size-12 flex-none items-center justify-center rounded-xl bg-line"
           >
             <IconChevronLeft size={22} />
           </Link>
@@ -224,7 +211,7 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
           <Link
             href={next.href}
             aria-label={`${t.stage.next}: ${next.title}`}
-            className="flex size-12 flex-none items-center justify-center rounded-[12px] bg-line"
+            className="flex size-12 flex-none items-center justify-center rounded-xl bg-line"
           >
             <IconChevronRight size={22} />
           </Link>

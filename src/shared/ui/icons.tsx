@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from 'react';
 
 /** Іконки в стилі Lucide: контур 2 px, закруглені кінці. */
 function Icon({ children, size = 20, ...props }: SVGProps<SVGSVGElement> & { size?: number }) {

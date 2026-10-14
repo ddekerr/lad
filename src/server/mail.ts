@@ -6,25 +6,23 @@ export async function sendLoginCodeMail(email: string, code: string): Promise<vo
   const host = process.env.SMTP_HOST;
 
   if (!host) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("SMTP_HOST is not configured");
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('SMTP_HOST is not configured');
     }
     console.log(`[mail:dev] Login code for ${email}: ${code}`);
     return;
   }
 
-  const nodemailer = await import("nodemailer");
+  const nodemailer = await import('nodemailer');
   const transport = nodemailer.createTransport({
     host,
     port: Number(process.env.SMTP_PORT ?? 587),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: process.env.SMTP_USER
-      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
-      : undefined,
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD } : undefined,
   });
 
   await transport.sendMail({
-    from: process.env.MAIL_FROM ?? "Лад <no-reply@localhost>",
+    from: process.env.MAIL_FROM ?? 'Лад <no-reply@localhost>',
     to: email,
     subject: `Лад: ${code} is your sign-in code / ${code} ваш код для входу`,
     text:

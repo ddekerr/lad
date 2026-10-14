@@ -1,1 +1,1 @@
-export { CopyView } from "./ui/CopyView";
+export { CopyView } from './ui/copy-view';

@@ -1,3 +1,3 @@
-export * from "./icons";
-export { Logo } from "./Logo";
-export { Forbidden } from "./Forbidden";
+export * from './icons';
+export { Logo } from './logo';
+export { Forbidden } from './forbidden';

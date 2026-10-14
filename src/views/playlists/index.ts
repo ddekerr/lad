@@ -1,1 +1,1 @@
-export { default as PlaylistsPage, metadata as playlistsMetadata } from "./ui/PlaylistsPage";
+export { default as PlaylistsPage, metadata as playlistsMetadata } from './ui/playlists.page';

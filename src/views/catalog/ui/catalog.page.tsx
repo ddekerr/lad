@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { can } from "@/entities/user";
-import { getCurrentUser } from "@/server/auth/session";
-import { prisma } from "@/server/db";
-import { getDictionary } from "@/server/i18n";
-import { catalogWhere } from "@/server/songs";
-import { IconChevronRight, IconSearch } from "@/shared/ui";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { can } from '@/entities/user';
+import { getCurrentUser } from '@/server/auth/session';
+import { prisma } from '@/server/db';
+import { getDictionary } from '@/server/i18n';
+import { catalogWhere } from '@/server/songs';
+import { IconChevronRight, IconSearch } from '@/shared/ui';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getDictionary();
@@ -18,11 +18,11 @@ type Props = { searchParams: Promise<{ q?: string }> };
 export default async function CatalogPage({ searchParams }: Props) {
   const [{ t }, user] = await Promise.all([getDictionary(), getCurrentUser()]);
   const { q } = await searchParams;
-  const query = q?.trim() ?? "";
+  const query = q?.trim() ?? '';
 
   const songs = await prisma.song.findMany({
     where: catalogWhere(query),
-    orderBy: { title: "asc" },
+    orderBy: { title: 'asc' },
     select: { id: true, title: true, artist: true, originalKey: true, language: true },
   });
 
@@ -36,7 +36,7 @@ export default async function CatalogPage({ searchParams }: Props) {
           </p>
         </div>
 
-        {user && can(user.actor, "song:write") && (
+        {user && can(user.actor, 'song:write') && (
           <Link
             href="/songs/new"
             className="flex min-h-11 items-center justify-center rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
@@ -50,10 +50,7 @@ export default async function CatalogPage({ searchParams }: Props) {
             {t.catalog.searchLabel}
           </label>
           <div className="relative flex-1">
-            <IconSearch
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-taupe"
-            />
+            <IconSearch size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-taupe" />
             <input
               id="q"
               name="q"
@@ -83,7 +80,7 @@ export default async function CatalogPage({ searchParams }: Props) {
             <li key={song.id}>
               <Link
                 href={`/songs/${song.id}`}
-                className="flex min-h-[72px] items-center gap-4 rounded-[16px] bg-surface px-4 py-3 hover:bg-line"
+                className="flex min-h-18 items-center gap-4 rounded-2xl bg-surface px-4 py-3 hover:bg-line"
               >
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{song.title}</div>

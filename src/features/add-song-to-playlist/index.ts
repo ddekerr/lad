@@ -1,1 +1,1 @@
-export { AddToPlaylist } from "./ui/AddToPlaylist";
+export { AddToPlaylist } from './ui/add-to-playlist';

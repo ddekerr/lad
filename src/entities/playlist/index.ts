@@ -1,1 +1,1 @@
-export * from "./model/playlist-input";
+export * from './model/playlist-input';

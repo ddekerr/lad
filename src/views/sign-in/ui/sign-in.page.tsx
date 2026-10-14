@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { SignInForm } from "@/features/sign-in";
-import { getCurrentUser } from "@/server/auth/session";
-import { getDictionary } from "@/server/i18n";
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { SignInForm } from '@/features/sign-in';
+import { getCurrentUser } from '@/server/auth/session';
+import { getDictionary } from '@/server/i18n';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getDictionary();
@@ -13,12 +13,8 @@ type Props = { searchParams: Promise<{ error?: string }> };
 
 /** Вхід / реєстрація: Google або email → код. Для вже авторизованого веде на головну. */
 export default async function SignInPage({ searchParams }: Props) {
-  const [user, { t }, { error }] = await Promise.all([
-    getCurrentUser(),
-    getDictionary(),
-    searchParams,
-  ]);
-  if (user) redirect("/");
+  const [user, { t }, { error }] = await Promise.all([getCurrentUser(), getDictionary(), searchParams]);
+  if (user) redirect('/');
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-5 py-4 sm:py-10">

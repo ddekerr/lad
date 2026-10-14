@@ -7,7 +7,7 @@
 export type SongSnapshot = {
   title: string;
   artist: string;
-  language: "en" | "uk";
+  language: 'en' | 'uk';
   originalKey: string;
   body: string;
   version: number;
@@ -22,7 +22,7 @@ export function copyDataFromSong(song: SongSnapshot) {
     originalKey: song.originalKey,
     body: song.body,
     keyShift: 0,
-    notes: "",
+    notes: '',
     syncedVersion: song.version,
     isStandalone: false,
   };
@@ -43,7 +43,7 @@ export function refreshDataFromSong(song: SongSnapshot) {
   };
 }
 
-export type CopyState = "current" | "outdated" | "original_deleted" | "standalone";
+export type CopyState = 'current' | 'outdated' | 'original_deleted' | 'standalone';
 
 /**
  * Стан копії:
@@ -57,12 +57,12 @@ export function copyState(copy: {
   syncedVersion: number | null;
   sourceSong: { version: number; deletedAt: Date | null } | null;
 }): CopyState {
-  if (copy.isStandalone) return "standalone";
-  if (!copy.sourceSong || copy.sourceSong.deletedAt) return "original_deleted";
+  if (copy.isStandalone) return 'standalone';
+  if (!copy.sourceSong || copy.sourceSong.deletedAt) return 'original_deleted';
   if (copy.syncedVersion === null || copy.sourceSong.version > copy.syncedVersion) {
-    return "outdated";
+    return 'outdated';
   }
-  return "current";
+  return 'current';
 }
 
 /** Позиція для нової копії в кінці плейлиста (позиції з нуля). */

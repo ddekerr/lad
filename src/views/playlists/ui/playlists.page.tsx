@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { PlaylistCreateForm } from "@/features/create-playlist";
-import { roleName } from "@/entities/role";
-import { getCurrentUser } from "@/server/auth/session";
-import { prisma } from "@/server/db";
-import { getDictionary } from "@/server/i18n";
-import { getUserMusicRoles } from "@/server/playlists";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { PlaylistCreateForm } from '@/features/create-playlist';
+import { roleName } from '@/entities/role';
+import { getCurrentUser } from '@/server/auth/session';
+import { prisma } from '@/server/db';
+import { getDictionary } from '@/server/i18n';
+import { getUserMusicRoles } from '@/server/playlists';
 
-export const metadata: Metadata = { title: "Лад · Playlists" };
+export const metadata: Metadata = { title: 'Лад · Playlists' };
 
 type Props = { searchParams: Promise<{ role?: string }> };
 
 /** Мої плейлисти в контексті однієї музичної ролі (або «без ролі»). */
 export default async function PlaylistsPage({ searchParams }: Props) {
   const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect('/sign-in');
 
   const [{ locale, t }, roles, { role }] = await Promise.all([
     getDictionary(),
@@ -23,19 +23,19 @@ export default async function PlaylistsPage({ searchParams }: Props) {
     searchParams,
   ]);
 
-  const valid = role === "none" || roles.some((r) => r.id === role);
-  const selected = valid && role ? role : (roles[0]?.id ?? "none");
-  const musicRoleId = selected === "none" ? null : selected;
+  const valid = role === 'none' || roles.some((r) => r.id === role);
+  const selected = valid && role ? role : (roles[0]?.id ?? 'none');
+  const musicRoleId = selected === 'none' ? null : selected;
 
   const playlists = await prisma.playlist.findMany({
     where: { userId: user.id, musicRoleId },
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: 'asc' },
     select: { id: true, name: true, _count: { select: { copies: true } } },
   });
 
   const chips = [
     ...roles.map((r) => ({ id: r.id, label: roleName(r, locale) })),
-    { id: "none", label: t.playlists.noRole },
+    { id: 'none', label: t.playlists.noRole },
   ];
 
   return (
@@ -48,10 +48,10 @@ export default async function PlaylistsPage({ searchParams }: Props) {
           <Link
             key={c.id}
             href={`/playlists?role=${c.id}`}
-            aria-current={c.id === selected ? "true" : undefined}
+            aria-current={c.id === selected ? 'true' : undefined}
             className={
-              "flex min-h-10 items-center rounded-full px-4 text-sm font-semibold " +
-              (c.id === selected ? "bg-amber text-ink" : "bg-surface text-cream hover:bg-line")
+              'flex min-h-10 items-center rounded-full px-4 text-sm font-semibold ' +
+              (c.id === selected ? 'bg-amber text-ink' : 'bg-surface text-cream hover:bg-line')
             }
           >
             {c.label}

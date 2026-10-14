@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma } from './db';
 
 /**
  * Скільки плейлистів і копій зникне разом із музичною роллю.

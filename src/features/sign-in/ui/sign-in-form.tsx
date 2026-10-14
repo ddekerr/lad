@@ -1,45 +1,43 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-import { fmt, type Dictionary } from "@/shared/i18n";
+import { useRouter } from 'next/navigation';
+import { useState, type FormEvent } from 'react';
+import { fmt, type Dictionary } from '@/shared/i18n';
 
 type Props = { t: Dictionary; initialError?: string };
 
-type ErrorKey = keyof Dictionary["auth"]["errors"];
+type ErrorKey = keyof Dictionary['auth']['errors'];
 
 function isErrorKey(t: Dictionary, key: string | undefined): key is ErrorKey {
   return key !== undefined && key in t.auth.errors;
 }
 
 const inputClass =
-  "h-12 w-full rounded-tile border border-line bg-ink px-3.5 text-base text-cream placeholder:text-dim";
+  'h-12 w-full rounded-tile border border-line bg-ink px-3.5 text-base text-cream placeholder:text-dim';
 const primaryButton =
-  "min-h-12 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-60";
+  'min-h-12 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-60';
 
 /** Вхід: Google або email із одноразовим кодом. Реєстрація й вхід це один потік. */
 export function SignInForm({ t, initialError }: Props) {
   const router = useRouter();
-  const [step, setStep] = useState<"email" | "code">("email");
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<ErrorKey | null>(
-    isErrorKey(t, initialError) ? initialError : null,
-  );
+  const [error, setError] = useState<ErrorKey | null>(isErrorKey(t, initialError) ? initialError : null);
 
   async function post(url: string, payload: unknown): Promise<{ ok: boolean; error?: string }> {
     try {
       const response = await fetch(url, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (response.ok) return { ok: true };
       const data = (await response.json().catch(() => ({}))) as { error?: string };
       return { ok: false, error: data.error };
     } catch {
-      return { ok: false, error: "generic" };
+      return { ok: false, error: 'generic' };
     }
   }
 
@@ -47,13 +45,13 @@ export function SignInForm({ t, initialError }: Props) {
     event.preventDefault();
     setBusy(true);
     setError(null);
-    const result = await post("/api/auth/email/request", { email });
+    const result = await post('/api/auth/email/request', { email });
     setBusy(false);
     if (result.ok) {
-      setStep("code");
-      setCode("");
+      setStep('code');
+      setCode('');
     } else {
-      setError(isErrorKey(t, result.error) ? result.error : "generic");
+      setError(isErrorKey(t, result.error) ? result.error : 'generic');
     }
   }
 
@@ -61,28 +59,25 @@ export function SignInForm({ t, initialError }: Props) {
     event.preventDefault();
     setBusy(true);
     setError(null);
-    const result = await post("/api/auth/email/verify", { email, code });
+    const result = await post('/api/auth/email/verify', { email, code });
     if (result.ok) {
-      router.replace("/");
+      router.replace('/');
       router.refresh();
       return;
     }
     setBusy(false);
-    setError(isErrorKey(t, result.error) ? result.error : "generic");
+    setError(isErrorKey(t, result.error) ? result.error : 'generic');
   }
 
   return (
     <div className="flex flex-col gap-5">
       {error && (
-        <p
-          role="alert"
-          className="rounded-tile border border-danger bg-surface px-4 py-3 text-sm text-danger"
-        >
+        <p role="alert" className="rounded-tile border border-danger bg-surface px-4 py-3 text-sm text-danger">
           {t.auth.errors[error]}
         </p>
       )}
 
-      {step === "email" ? (
+      {step === 'email' ? (
         <>
           <a
             href="/api/auth/google"
@@ -133,7 +128,7 @@ export function SignInForm({ t, initialError }: Props) {
             required
             autoFocus
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
             className={`${inputClass} text-center font-heading text-2xl tracking-[0.4em]`}
           />
           <button type="submit" disabled={busy || code.length !== 6} className={primaryButton}>
@@ -142,7 +137,7 @@ export function SignInForm({ t, initialError }: Props) {
           <button
             type="button"
             onClick={() => {
-              setStep("email");
+              setStep('email');
               setError(null);
             }}
             className="self-start text-sm text-amber underline underline-offset-4"

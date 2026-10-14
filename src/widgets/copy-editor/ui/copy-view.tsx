@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { SongBody, type DisplayMode } from "@/entities/song";
-import type { CopyState } from "@/entities/song-copy";
-import type { Dictionary } from "@/shared/i18n";
-import { shouldPreferFlats, transposeKey } from "@/shared/lib/chords";
-import { IconChevronLeft, IconExpand, IconMinus, IconPlus, IconWarning } from "@/shared/ui";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { SongBody, type DisplayMode } from '@/entities/song';
+import type { CopyState } from '@/entities/song-copy';
+import type { Dictionary } from '@/shared/i18n';
+import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
+import { IconChevronLeft, IconExpand, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
 
 type Props = {
   copy: {
     id: string;
     title: string;
     artist: string;
-    language: "en" | "uk";
+    language: 'en' | 'uk';
     originalKey: string;
     body: string;
     keyShift: number;
@@ -25,9 +25,8 @@ type Props = {
   t: Dictionary;
 };
 
-const primary =
-  "min-h-11 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-50";
-const secondary = "min-h-11 rounded-tile bg-line px-5 font-semibold text-cream hover:bg-taupe hover:text-ink";
+const primary = 'min-h-11 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-50';
+const secondary = 'min-h-11 rounded-tile bg-line px-5 font-semibold text-cream hover:bg-taupe hover:text-ink';
 
 /**
  * Моя копія: тональність і нотатки зберігаються в самій копії, правки тексту живуть
@@ -35,10 +34,10 @@ const secondary = "min-h-11 rounded-tile bg-line px-5 font-semibold text-cream h
  */
 export function CopyView({ copy, playlist, t }: Props) {
   const router = useRouter();
-  const [mode, setMode] = useState<DisplayMode>("both");
+  const [mode, setMode] = useState<DisplayMode>('both');
   const [shift, setShift] = useState(copy.keyShift);
   const [notes, setNotes] = useState(copy.notes);
-  const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
+  const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle');
   const [confirmUpdate, setConfirmUpdate] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -48,36 +47,36 @@ export function CopyView({ copy, playlist, t }: Props) {
   const currentKey = transposeKey(copy.originalKey, shift);
 
   async function call(url: string, method: string, body?: unknown): Promise<boolean> {
-    setStatus("idle");
+    setStatus('idle');
     const res = await fetch(url, {
       method,
-      headers: { "content-type": "application/json" },
+      headers: { 'content-type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body),
     }).catch(() => null);
-    setStatus(res?.ok ? "saved" : "error");
+    setStatus(res?.ok ? 'saved' : 'error');
     return Boolean(res?.ok);
   }
 
   async function changeShift(delta: number) {
     const next = (((shift + delta) % 12) + 12) % 12;
     setShift(next);
-    await call(`/api/copies/${copy.id}`, "PATCH", { keyShift: next });
+    await call(`/api/copies/${copy.id}`, 'PATCH', { keyShift: next });
   }
 
   async function saveNotes() {
-    await call(`/api/copies/${copy.id}`, "PATCH", { notes });
+    await call(`/api/copies/${copy.id}`, 'PATCH', { notes });
   }
 
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
-    if (await call(`/api/copies/${copy.id}`, "PATCH", draft)) {
+    if (await call(`/api/copies/${copy.id}`, 'PATCH', draft)) {
       setEditing(false);
       router.refresh();
     }
   }
 
   async function update() {
-    if (await call(`/api/copies/${copy.id}/refresh`, "POST")) {
+    if (await call(`/api/copies/${copy.id}/refresh`, 'POST')) {
       setConfirmUpdate(false);
       router.refresh();
       // свіжі дані приходять із сервера; чернетку редагування скидаємо після перезавантаження
@@ -85,17 +84,17 @@ export function CopyView({ copy, playlist, t }: Props) {
   }
 
   async function keepOwn() {
-    if (await call(`/api/copies/${copy.id}/keep`, "POST")) router.refresh();
+    if (await call(`/api/copies/${copy.id}/keep`, 'POST')) router.refresh();
   }
 
   async function deleteCopy() {
-    if (await call(`/api/copies/${copy.id}`, "DELETE")) router.push(`/playlists/${playlist.id}`);
+    if (await call(`/api/copies/${copy.id}`, 'DELETE')) router.push(`/playlists/${playlist.id}`);
   }
 
   const modes: { value: DisplayMode; label: string }[] = [
-    { value: "text", label: t.song.modeText },
-    { value: "chords", label: t.song.modeChords },
-    { value: "both", label: t.song.modeBoth },
+    { value: 'text', label: t.song.modeText },
+    { value: 'chords', label: t.song.modeChords },
+    { value: 'both', label: t.song.modeBoth },
   ];
 
   const banner = (title: string, body: string, actions: React.ReactNode) => (
@@ -122,16 +121,14 @@ export function CopyView({ copy, playlist, t }: Props) {
         <h1 className="font-heading text-2xl font-bold sm:text-3xl">{copy.title}</h1>
         <div className="flex flex-wrap items-center gap-3 text-muted">
           <span>{copy.artist}</span>
-          <span className="rounded-full bg-amber px-2.5 py-0.5 text-xs font-semibold text-ink">
-            {t.copy.badge}
-          </span>
+          <span className="rounded-full bg-amber px-2.5 py-0.5 text-xs font-semibold text-ink">{t.copy.badge}</span>
           <span className="rounded-full bg-line px-2.5 py-0.5 text-xs font-semibold text-cream">
             {t.song.language[copy.language]}
           </span>
         </div>
       </div>
 
-      {copy.state === "outdated" &&
+      {copy.state === 'outdated' &&
         banner(
           t.copy.outdatedTitle,
           t.copy.outdatedBody,
@@ -154,7 +151,7 @@ export function CopyView({ copy, playlist, t }: Props) {
           ),
         )}
 
-      {copy.state === "original_deleted" &&
+      {copy.state === 'original_deleted' &&
         banner(
           t.copy.deletedTitle,
           t.copy.deletedBody,
@@ -168,7 +165,7 @@ export function CopyView({ copy, playlist, t }: Props) {
           </>,
         )}
 
-      {copy.state === "standalone" && <p className="text-sm text-muted">{t.copy.standalone}</p>}
+      {copy.state === 'standalone' && <p className="text-sm text-muted">{t.copy.standalone}</p>}
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <section
@@ -207,12 +204,7 @@ export function CopyView({ copy, playlist, t }: Props) {
               <div>
                 <div className="mb-2 text-sm text-muted">{t.copy.preview}</div>
                 <div className="rounded-tile bg-ink p-4">
-                  <SongBody
-                    body={draft.body}
-                    mode="both"
-                    shift={shift}
-                    preferFlats={preferFlats}
-                  />
+                  <SongBody body={draft.body} mode="both" shift={shift} preferFlats={preferFlats} />
                 </div>
               </div>
               <div className="flex gap-3">
@@ -306,8 +298,8 @@ export function CopyView({ copy, playlist, t }: Props) {
               {t.copy.saveNotes}
             </button>
             <p aria-live="polite" className="min-h-5 text-sm">
-              {status === "saved" && <span className="text-success">{t.copy.saved}</span>}
-              {status === "error" && <span className="text-danger">{t.copy.failed}</span>}
+              {status === 'saved' && <span className="text-success">{t.copy.saved}</span>}
+              {status === 'error' && <span className="text-danger">{t.copy.failed}</span>}
             </p>
           </div>
 

@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/server/auth/session";
-import { prisma } from "@/server/db";
-import { getDictionary } from "@/server/i18n";
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/server/auth/session';
+import { prisma } from '@/server/db';
+import { getDictionary } from '@/server/i18n';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getDictionary();
@@ -12,11 +12,11 @@ export async function generateMetadata(): Promise<Metadata> {
 /** Профіль: email, ролі (лише перегляд), мова, вихід. */
 export default async function ProfilePage() {
   const [user, { locale, t }] = await Promise.all([getCurrentUser(), getDictionary()]);
-  if (!user) redirect("/sign-in");
+  if (!user) redirect('/sign-in');
 
   const roles = await prisma.role.findMany({
     where: { key: { in: user.roles } },
-    orderBy: [{ kind: "asc" }, { key: "asc" }],
+    orderBy: [{ kind: 'asc' }, { key: 'asc' }],
   });
 
   return (
@@ -35,11 +35,11 @@ export default async function ProfilePage() {
             <li
               key={role.id}
               className={
-                "rounded-full px-3 py-1 text-sm font-semibold " +
-                (role.key === "member" ? "bg-amber text-ink" : "bg-line text-cream")
+                'rounded-full px-3 py-1 text-sm font-semibold ' +
+                (role.key === 'member' ? 'bg-amber text-ink' : 'bg-line text-cream')
               }
             >
-              {locale === "uk" ? role.nameUk : role.nameEn}
+              {locale === 'uk' ? role.nameUk : role.nameEn}
             </li>
           ))}
           {user.isSuperAdmin && (

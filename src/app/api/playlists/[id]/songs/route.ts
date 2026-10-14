@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { copyDataFromSong, nextPosition } from "@/entities/song-copy";
-import { requireMember } from "@/server/auth/api";
-import { badRequest, notFound } from "@/server/auth/guard";
-import { prisma } from "@/server/db";
-import { getOwnedPlaylist } from "@/server/playlists";
+import { NextResponse } from 'next/server';
+import { copyDataFromSong, nextPosition } from '@/entities/song-copy';
+import { requireMember } from '@/server/auth/api';
+import { badRequest, notFound } from '@/server/auth/guard';
+import { prisma } from '@/server/db';
+import { getOwnedPlaylist } from '@/server/playlists';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -15,17 +15,17 @@ type Context = { params: Promise<{ id: string }> };
  */
 export async function POST(request: Request, { params }: Context) {
   const auth = await requireMember();
-  if ("response" in auth) return auth.response;
+  if ('response' in auth) return auth.response;
 
   const { id } = await params;
   const playlist = await getOwnedPlaylist(auth.user.id, id);
-  if (!playlist) return notFound("playlist");
+  if (!playlist) return notFound('playlist');
 
   const body = (await request.json().catch(() => null)) as { songId?: unknown } | null;
-  if (typeof body?.songId !== "string") return badRequest("invalid_song");
+  if (typeof body?.songId !== 'string') return badRequest('invalid_song');
 
   const song = await prisma.song.findFirst({ where: { id: body.songId, deletedAt: null } });
-  if (!song) return notFound("song");
+  if (!song) return notFound('song');
 
   const copy = await prisma.$transaction(async (tx) => {
     const existing = await tx.songCopy.findMany({

@@ -1,5 +1,5 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import {
   copyDataFromSong,
   copyState,
@@ -9,62 +9,56 @@ import {
   nextPosition,
   refreshDataFromSong,
   type SongSnapshot,
-} from "./copies";
+} from './copies';
 
 const song: SongSnapshot = {
-  title: "Demo",
-  artist: "Artist",
-  language: "en",
-  originalKey: "G",
-  body: "[G]one [D]two",
+  title: 'Demo',
+  artist: 'Artist',
+  language: 'en',
+  originalKey: 'G',
+  body: '[G]one [D]two',
   version: 3,
 };
 
-describe("створення копії", () => {
-  it("бере вміст оригіналу, зсув 0, порожні нотатки й поточну версію", () => {
+describe('створення копії', () => {
+  it('бере вміст оригіналу, зсув 0, порожні нотатки й поточну версію', () => {
     assert.deepEqual(copyDataFromSong(song), {
-      title: "Demo",
-      artist: "Artist",
-      language: "en",
-      originalKey: "G",
-      body: "[G]one [D]two",
+      title: 'Demo',
+      artist: 'Artist',
+      language: 'en',
+      originalKey: 'G',
+      body: '[G]one [D]two',
       keyShift: 0,
-      notes: "",
+      notes: '',
       syncedVersion: 3,
       isStandalone: false,
     });
   });
 });
 
-describe("оновлення копії згідно з оригіналом", () => {
-  it("замінює вміст і версію, але не чіпає нотатки й зсув", () => {
-    const data = refreshDataFromSong({ ...song, body: "[A]new", version: 5 });
-    assert.equal(data.body, "[A]new");
+describe('оновлення копії згідно з оригіналом', () => {
+  it('замінює вміст і версію, але не чіпає нотатки й зсув', () => {
+    const data = refreshDataFromSong({ ...song, body: '[A]new', version: 5 });
+    assert.equal(data.body, '[A]new');
     assert.equal(data.syncedVersion, 5);
-    assert.equal("notes" in data, false);
-    assert.equal("keyShift" in data, false);
+    assert.equal('notes' in data, false);
+    assert.equal('keyShift' in data, false);
   });
 });
 
-describe("стан копії", () => {
+describe('стан копії', () => {
   const live = { version: 3, deletedAt: null };
 
-  it("current: версії збігаються", () => {
-    assert.equal(copyState({ isStandalone: false, syncedVersion: 3, sourceSong: live }), "current");
+  it('current: версії збігаються', () => {
+    assert.equal(copyState({ isStandalone: false, syncedVersion: 3, sourceSong: live }), 'current');
   });
 
-  it("outdated: оригінал новіший", () => {
-    assert.equal(
-      copyState({ isStandalone: false, syncedVersion: 2, sourceSong: live }),
-      "outdated",
-    );
+  it('outdated: оригінал новіший', () => {
+    assert.equal(copyState({ isStandalone: false, syncedVersion: 2, sourceSong: live }), 'outdated');
   });
 
-  it("outdated, якщо версія копії невідома", () => {
-    assert.equal(
-      copyState({ isStandalone: false, syncedVersion: null, sourceSong: live }),
-      "outdated",
-    );
+  it('outdated, якщо версія копії невідома', () => {
+    assert.equal(copyState({ isStandalone: false, syncedVersion: null, sourceSong: live }), 'outdated');
   });
 
   it("original_deleted: м'яке видалення", () => {
@@ -74,66 +68,60 @@ describe("стан копії", () => {
         syncedVersion: 3,
         sourceSong: { version: 3, deletedAt: new Date() },
       }),
-      "original_deleted",
+      'original_deleted',
     );
   });
 
-  it("original_deleted: оригінал остаточно зник", () => {
-    assert.equal(
-      copyState({ isStandalone: false, syncedVersion: 3, sourceSong: null }),
-      "original_deleted",
-    );
+  it('original_deleted: оригінал остаточно зник', () => {
+    assert.equal(copyState({ isStandalone: false, syncedVersion: 3, sourceSong: null }), 'original_deleted');
   });
 
-  it("standalone має пріоритет над усім", () => {
-    assert.equal(
-      copyState({ isStandalone: true, syncedVersion: 1, sourceSong: null }),
-      "standalone",
-    );
+  it('standalone має пріоритет над усім', () => {
+    assert.equal(copyState({ isStandalone: true, syncedVersion: 1, sourceSong: null }), 'standalone');
     assert.equal(
       copyState({
         isStandalone: true,
         syncedVersion: 1,
         sourceSong: { version: 9, deletedAt: new Date() },
       }),
-      "standalone",
+      'standalone',
     );
   });
 });
 
-describe("порядок у плейлисті", () => {
-  it("nextPosition: з нуля й після останньої", () => {
+describe('порядок у плейлисті', () => {
+  it('nextPosition: з нуля й після останньої', () => {
     assert.equal(nextPosition([]), 0);
     assert.equal(nextPosition([0, 1, 2]), 3);
     assert.equal(nextPosition([0, 5]), 6);
   });
 
-  it("moveItem рухає на крок і не виходить за межі", () => {
-    assert.deepEqual(moveItem(["a", "b", "c"], "b", -1), ["b", "a", "c"]);
-    assert.deepEqual(moveItem(["a", "b", "c"], "b", 1), ["a", "c", "b"]);
-    assert.deepEqual(moveItem(["a", "b", "c"], "a", -1), ["a", "b", "c"]);
-    assert.deepEqual(moveItem(["a", "b", "c"], "c", 1), ["a", "b", "c"]);
-    assert.deepEqual(moveItem(["a", "b"], "zzz", 1), ["a", "b"]);
+  it('moveItem рухає на крок і не виходить за межі', () => {
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'b', -1), ['b', 'a', 'c']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'b', 1), ['a', 'c', 'b']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'a', -1), ['a', 'b', 'c']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'c', 1), ['a', 'b', 'c']);
+    assert.deepEqual(moveItem(['a', 'b'], 'zzz', 1), ['a', 'b']);
   });
 
-  it("moveItem не змінює вхідний масив", () => {
-    const input = ["a", "b"];
-    moveItem(input, "a", 1);
-    assert.deepEqual(input, ["a", "b"]);
+  it('moveItem не змінює вхідний масив', () => {
+    const input = ['a', 'b'];
+    moveItem(input, 'a', 1);
+    assert.deepEqual(input, ['a', 'b']);
   });
 
-  it("isSamePermutation: ті самі елементи в іншому порядку", () => {
-    assert.equal(isSamePermutation(["a", "b", "c"], ["c", "a", "b"]), true);
-    assert.equal(isSamePermutation(["a", "b"], ["a", "a"]), false);
-    assert.equal(isSamePermutation(["a", "b"], ["a"]), false);
-    assert.equal(isSamePermutation(["a", "b"], ["a", "x"]), false);
+  it('isSamePermutation: ті самі елементи в іншому порядку', () => {
+    assert.equal(isSamePermutation(['a', 'b', 'c'], ['c', 'a', 'b']), true);
+    assert.equal(isSamePermutation(['a', 'b'], ['a', 'a']), false);
+    assert.equal(isSamePermutation(['a', 'b'], ['a']), false);
+    assert.equal(isSamePermutation(['a', 'b'], ['a', 'x']), false);
     assert.equal(isSamePermutation([], []), true);
   });
 
-  it("neighbours: попередня й наступна пісня", () => {
-    assert.deepEqual(neighbours(["a", "b", "c"], "b"), { prev: "a", next: "c", index: 1 });
-    assert.deepEqual(neighbours(["a", "b", "c"], "a"), { prev: null, next: "b", index: 0 });
-    assert.deepEqual(neighbours(["a", "b", "c"], "c"), { prev: "b", next: null, index: 2 });
-    assert.deepEqual(neighbours(["a"], "zzz"), { prev: null, next: null, index: -1 });
+  it('neighbours: попередня й наступна пісня', () => {
+    assert.deepEqual(neighbours(['a', 'b', 'c'], 'b'), { prev: 'a', next: 'c', index: 1 });
+    assert.deepEqual(neighbours(['a', 'b', 'c'], 'a'), { prev: null, next: 'b', index: 0 });
+    assert.deepEqual(neighbours(['a', 'b', 'c'], 'c'), { prev: 'b', next: null, index: 2 });
+    assert.deepEqual(neighbours(['a'], 'zzz'), { prev: null, next: null, index: -1 });
   });
 });

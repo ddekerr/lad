@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState } from "react";
-import { SongBody, type DisplayMode } from "@/entities/song";
-import type { Dictionary } from "@/shared/i18n";
-import { shouldPreferFlats, transposeKey } from "@/shared/lib/chords";
-import { IconExpand, IconMinus, IconPlus } from "@/shared/ui";
+import Link from 'next/link';
+import { useState } from 'react';
+import { SongBody, type DisplayMode } from '@/entities/song';
+import type { Dictionary } from '@/shared/i18n';
+import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
+import { IconExpand, IconMinus, IconPlus } from '@/shared/ui';
 
 type Props = {
   id: string;
@@ -19,7 +19,7 @@ type Props = {
  * база не змінюється (гість теж може).
  */
 export function SongView({ id, body, originalKey, t }: Props) {
-  const [mode, setMode] = useState<DisplayMode>("both");
+  const [mode, setMode] = useState<DisplayMode>('both');
   const [shift, setShift] = useState(0);
 
   const preferFlats = shouldPreferFlats(originalKey, shift);
@@ -27,9 +27,9 @@ export function SongView({ id, body, originalKey, t }: Props) {
   const step = (delta: number) => setShift((s) => (((s + delta) % 12) + 12) % 12);
 
   const modes: { value: DisplayMode; label: string }[] = [
-    { value: "text", label: t.song.modeText },
-    { value: "chords", label: t.song.modeChords },
-    { value: "both", label: t.song.modeBoth },
+    { value: 'text', label: t.song.modeText },
+    { value: 'chords', label: t.song.modeChords },
+    { value: 'both', label: t.song.modeBoth },
   ];
 
   return (

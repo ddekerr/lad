@@ -1,3 +1,3 @@
-export { UsersPage as default, generateUsersMetadata as generateMetadata } from "@/views/users-roles";
+export { UsersPage as default, generateUsersMetadata as generateMetadata } from '@/views/users-roles';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';

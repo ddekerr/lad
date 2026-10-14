@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { canRevokeRole, isSuperAdminEmail } from "@/entities/user";
-import { superAdminEmails } from "@/server/auth/config";
-import { forbidden, notFound, unauthorized } from "@/server/auth/guard";
-import { getCurrentUser } from "@/server/auth/session";
-import { prisma } from "@/server/db";
+import { NextResponse } from 'next/server';
+import { canRevokeRole, isSuperAdminEmail } from '@/entities/user';
+import { superAdminEmails } from '@/server/auth/config';
+import { forbidden, notFound, unauthorized } from '@/server/auth/guard';
+import { getCurrentUser } from '@/server/auth/session';
+import { prisma } from '@/server/db';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Context = { params: Promise<{ id: string; roleId: string }> };
 
@@ -23,8 +23,8 @@ export async function DELETE(_request: Request, { params }: Context) {
     prisma.role.findUnique({ where: { id: roleId } }),
     prisma.user.findUnique({ where: { id }, select: { id: true, email: true } }),
   ]);
-  if (!role) return notFound("role");
-  if (!target) return notFound("user");
+  if (!role) return notFound('role');
+  if (!target) return notFound('user');
 
   const decision = canRevokeRole(actor.actor, role, {
     isSuperAdmin: isSuperAdminEmail(target.email, superAdminEmails()),
@@ -32,7 +32,7 @@ export async function DELETE(_request: Request, { params }: Context) {
   if (!decision.ok) return forbidden(decision.reason);
 
   await prisma.$transaction(async (tx) => {
-    if (role.kind === "music") {
+    if (role.kind === 'music') {
       // Копії видаляються каскадом разом із плейлистами
       await tx.playlist.deleteMany({ where: { userId: target.id, musicRoleId: role.id } });
     }

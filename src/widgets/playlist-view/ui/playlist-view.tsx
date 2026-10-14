@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { type CopyState, moveItem, CopyStateBadge } from "@/entities/song-copy";
-import { fmt, type Dictionary } from "@/shared/i18n";
-import { IconArrowDown, IconArrowUp, IconChevronLeft, IconClose, IconExpand } from "@/shared/ui";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { type CopyState, moveItem, CopyStateBadge } from '@/entities/song-copy';
+import { fmt, type Dictionary } from '@/shared/i18n';
+import { IconArrowDown, IconArrowUp, IconChevronLeft, IconClose, IconExpand } from '@/shared/ui';
 
 type Props = {
   playlist: { id: string; name: string; roleLabel: string; roleId: string | null };
@@ -14,7 +14,7 @@ type Props = {
 };
 
 const iconButton =
-  "flex size-11 flex-none items-center justify-center rounded-tile bg-line text-cream hover:bg-taupe hover:text-ink disabled:opacity-30";
+  'flex size-11 flex-none items-center justify-center rounded-tile bg-line text-cream hover:bg-taupe hover:text-ink disabled:opacity-30';
 
 /** Плейлист: порядок копій, перейменування, видалення, перехід до сцени. */
 export function PlaylistView({ playlist, copies: initial, t }: Props) {
@@ -25,13 +25,13 @@ export function PlaylistView({ playlist, copies: initial, t }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState(false);
 
-  const back = `/playlists?role=${playlist.roleId ?? "none"}`;
+  const back = `/playlists?role=${playlist.roleId ?? 'none'}`;
 
   async function call(url: string, method: string, body?: unknown): Promise<boolean> {
     setError(false);
     const res = await fetch(url, {
       method,
-      headers: { "content-type": "application/json" },
+      headers: { 'content-type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body),
     }).catch(() => null);
     if (!res?.ok) setError(true);
@@ -42,37 +42,34 @@ export function PlaylistView({ playlist, copies: initial, t }: Props) {
     const next = moveItem(copies, copies[index], delta);
     const previous = copies;
     setCopies(next);
-    const ok = await call(`/api/playlists/${playlist.id}/songs/order`, "PATCH", {
+    const ok = await call(`/api/playlists/${playlist.id}/songs/order`, 'PATCH', {
       copyIds: next.map((c) => c.id),
     });
     if (!ok) setCopies(previous);
   }
 
   async function removeCopy(id: string) {
-    if (!(await call(`/api/copies/${id}`, "DELETE"))) return;
+    if (!(await call(`/api/copies/${id}`, 'DELETE'))) return;
     setCopies((list) => list.filter((c) => c.id !== id));
   }
 
   async function rename(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    if (await call(`/api/playlists/${playlist.id}`, "PATCH", { name })) {
+    if (await call(`/api/playlists/${playlist.id}`, 'PATCH', { name })) {
       setEditing(false);
       router.refresh();
     }
   }
 
   async function deletePlaylist() {
-    if (await call(`/api/playlists/${playlist.id}`, "DELETE")) router.push(back);
+    if (await call(`/api/playlists/${playlist.id}`, 'DELETE')) router.push(back);
   }
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <Link
-          href={back}
-          className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-cream"
-        >
+        <Link href={back} className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-cream">
           <IconChevronLeft size={18} />
           {t.playlists.back}
         </Link>
@@ -86,10 +83,7 @@ export function PlaylistView({ playlist, copies: initial, t }: Props) {
               onChange={(e) => setName(e.target.value)}
               className="min-h-11 flex-1 rounded-tile bg-surface px-4 text-cream"
             />
-            <button
-              type="submit"
-              className="min-h-11 rounded-tile bg-amber px-6 font-semibold text-ink"
-            >
+            <button type="submit" className="min-h-11 rounded-tile bg-amber px-6 font-semibold text-ink">
               {t.playlists.save}
             </button>
             <button
@@ -108,9 +102,7 @@ export function PlaylistView({ playlist, copies: initial, t }: Props) {
         )}
 
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-line px-2.5 py-0.5 text-xs font-semibold">
-            {playlist.roleLabel}
-          </span>
+          <span className="rounded-full bg-line px-2.5 py-0.5 text-xs font-semibold">{playlist.roleLabel}</span>
           {!editing && (
             <button
               type="button"
@@ -196,12 +188,8 @@ export function PlaylistView({ playlist, copies: initial, t }: Props) {
       <div className="border-t border-line pt-6">
         {confirmDelete ? (
           <div className="flex flex-col gap-3 rounded-card bg-surface p-5">
-            <div className="font-semibold">
-              {fmt(t.playlists.deleteTitle, { name: playlist.name })}
-            </div>
-            <p className="text-sm text-muted">
-              {fmt(t.playlists.deleteBody, { count: copies.length })}
-            </p>
+            <div className="font-semibold">{fmt(t.playlists.deleteTitle, { name: playlist.name })}</div>
+            <p className="text-sm text-muted">{fmt(t.playlists.deleteBody, { count: copies.length })}</p>
             <div className="flex gap-3">
               <button
                 type="button"

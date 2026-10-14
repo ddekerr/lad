@@ -1,1 +1,1 @@
-export { NavLinks, type NavItem } from "./ui/NavLinks";
+export { NavLinks, type NavItem } from './ui/nav-links';

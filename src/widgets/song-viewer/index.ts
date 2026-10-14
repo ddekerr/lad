@@ -1,1 +1,1 @@
-export { SongView } from "./ui/SongView";
+export { SongView } from './ui/song-view';

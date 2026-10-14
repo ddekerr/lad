@@ -1,1 +1,1 @@
-export { PlaylistView } from "./ui/PlaylistView";
+export { PlaylistView } from './ui/playlist-view';
