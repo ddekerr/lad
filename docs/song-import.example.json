@@ -1,0 +1,18 @@
+{
+  "songs": [
+    {
+      "title": "Amazing Grace",
+      "artist": "Traditional",
+      "language": "en",
+      "originalKey": "G",
+      "body": "[G]Amazing grace, how [C]sweet the [G]sound\nThat [G]saved a wretch like [D]me\nI [G]once was lost, but [C]now am [G]found\nWas [Em]blind but [D]now I [G]see"
+    },
+    {
+      "title": "Ой, чий то кінь стоїть",
+      "artist": "Народна",
+      "language": "uk",
+      "originalKey": "Am",
+      "body": "[Am]Ой, чий то кінь стоїть, що [E]сива гривонька\n[Am]Ой, там стоїть козак, [E]душа його болить"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ImportSongs } from '@/features/import-songs';
 import { can } from '@/entities/user';
 import { getCurrentUser } from '@/server/auth/session';
 import { prisma } from '@/server/db';
@@ -37,12 +38,15 @@ export default async function CatalogPage({ searchParams }: Props) {
         </div>
 
         {user && can(user.actor, 'song:write') && (
-          <Link
-            href="/songs/new"
-            className="flex min-h-11 items-center justify-center rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
-          >
-            {t.editor.newSong}
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/songs/new"
+              className="flex min-h-11 items-center justify-center rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
+            >
+              {t.editor.newSong}
+            </Link>
+            <ImportSongs t={t} />
+          </div>
         )}
 
         <form role="search" className="flex w-full gap-2 sm:max-w-md">
