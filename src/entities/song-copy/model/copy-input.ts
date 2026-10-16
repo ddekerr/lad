@@ -1,4 +1,5 @@
 /** Перевірка введення для персональних копій пісень (чиста логіка, без БД). */
+import { parseBpm, parseDynamics, parseTimeSignature, type SectionDynamics } from './copy-parameters';
 
 export const MAX_TITLE = 200;
 export const MAX_BODY = 50_000;
@@ -10,6 +11,11 @@ export type CopyPatch = {
   body?: string;
   notes?: string;
   keyShift?: number;
+  /** null очищає значення */
+  bpm?: number | null;
+  timeSignature?: string | null;
+  /** Повна заміна: об'єкт «id розділу → 1..5» */
+  sectionDynamics?: SectionDynamics;
 };
 
 export type PatchResult = { ok: true; data: CopyPatch } | { ok: false; error: string };
@@ -49,6 +55,28 @@ export function parseCopyPatch(input: unknown): PatchResult {
       return { ok: false, error: 'invalid_key_shift' };
     }
     data.keyShift = ((raw.keyShift % 12) + 12) % 12;
+  }
+
+  if (raw.bpm !== undefined) {
+    if (raw.bpm === null) data.bpm = null;
+    else {
+      const bpm = parseBpm(raw.bpm);
+      if (bpm === null) return { ok: false, error: 'invalid_bpm' };
+      data.bpm = bpm;
+    }
+  }
+  if (raw.timeSignature !== undefined) {
+    if (raw.timeSignature === null) data.timeSignature = null;
+    else {
+      const signature = parseTimeSignature(raw.timeSignature);
+      if (signature === null) return { ok: false, error: 'invalid_time_signature' };
+      data.timeSignature = signature;
+    }
+  }
+  if (raw.sectionDynamics !== undefined) {
+    const dynamics = parseDynamics(raw.sectionDynamics);
+    if (dynamics === null) return { ok: false, error: 'invalid_dynamics' };
+    data.sectionDynamics = dynamics;
   }
 
   if (Object.keys(data).length === 0) return { ok: false, error: 'empty_patch' };

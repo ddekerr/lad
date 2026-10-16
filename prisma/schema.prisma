@@ -175,6 +175,11 @@ model SongCopy {
   notes         String   @default("") @db.Text
   syncedVersion Int?
   isStandalone  Boolean  @default(false)
+  /// Параметри для генерації партій (задає власник копії): темп, розмір, динаміка розділів
+  bpm             Int?
+  timeSignature   String?
+  /// {"<id розділу>": 1..5}; id розділу це підпис або тип мітки без регістру
+  sectionDynamics Json     @default("{}")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

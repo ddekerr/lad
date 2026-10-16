@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { CopyView } from '@/widgets/copy-editor';
-import { copyState } from '@/entities/song-copy';
+import { copyState, readDynamics } from '@/entities/song-copy';
 import { getCurrentUser } from '@/server/auth/session';
 import { getDictionary } from '@/server/i18n';
 import { getOwnedCopy } from '@/server/playlists';
@@ -31,6 +31,9 @@ export default async function CopyPage({ params }: Props) {
         body: copy.body,
         keyShift: copy.keyShift,
         notes: copy.notes,
+        bpm: copy.bpm,
+        timeSignature: copy.timeSignature,
+        sectionDynamics: readDynamics(copy.sectionDynamics),
         state: copyState(copy),
       }}
       playlist={{ id: copy.playlist.id, name: copy.playlist.name }}

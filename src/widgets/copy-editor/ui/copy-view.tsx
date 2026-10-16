@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { BodyField, SongBody, type DisplayMode } from '@/entities/song';
-import type { CopyState } from '@/entities/song-copy';
+import type { CopyState, SectionDynamics } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
 import { IconChevronLeft, IconExpand, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
+import { CopyParameters } from './copy-parameters';
 
 type Props = {
   copy: {
@@ -19,6 +20,9 @@ type Props = {
     body: string;
     keyShift: number;
     notes: string;
+    bpm: number | null;
+    timeSignature: string | null;
+    sectionDynamics: SectionDynamics;
     state: CopyState;
   };
   playlist: { id: string; name: string };
@@ -354,6 +358,13 @@ export function CopyView({ copy, playlist, t }: Props) {
           )}
         </aside>
       </div>
+
+      <CopyParameters
+        copyId={copy.id}
+        body={copy.body}
+        initial={{ bpm: copy.bpm, timeSignature: copy.timeSignature, sectionDynamics: copy.sectionDynamics }}
+        t={t}
+      />
     </main>
   );
 }
