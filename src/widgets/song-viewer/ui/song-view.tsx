@@ -38,7 +38,7 @@ export function SongView({ id, body, originalKey, t }: Props) {
         aria-label={t.song.display}
         className="min-w-0 flex-1 overflow-x-auto rounded-card bg-surface p-5 sm:p-8"
       >
-        <SongBody body={body} mode={mode} shift={shift} preferFlats={preferFlats} />
+        <SongBody body={body} mode={mode} shift={shift} preferFlats={preferFlats} sectionNames={t.sections.names} />
       </section>
 
       <aside className="flex flex-col gap-6 rounded-card bg-surface p-5 lg:sticky lg:top-6 lg:w-80 lg:flex-none">

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { SongBody, type DisplayMode } from '@/entities/song';
+import { BodyField, SongBody, type DisplayMode } from '@/entities/song';
 import type { CopyState } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
@@ -191,21 +191,24 @@ export function CopyView({ copy, playlist, t }: Props) {
                   className="min-h-11 rounded-tile bg-ink px-4"
                 />
               </label>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm text-muted">{t.copy.editBody}</span>
-                <textarea
-                  value={draft.body}
-                  onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-                  rows={16}
-                  spellCheck={false}
-                  className="rounded-tile bg-ink p-4 font-mono text-sm"
-                />
-                <span className="text-xs text-muted">{t.copy.editHint}</span>
-              </label>
+              <BodyField
+                label={t.copy.editBody}
+                hint={t.copy.editHint}
+                value={draft.body}
+                onChange={(body) => setDraft({ ...draft, body })}
+                rows={16}
+                t={t}
+              />
               <div>
                 <div className="mb-2 text-sm text-muted">{t.copy.preview}</div>
                 <div className="rounded-tile bg-ink p-4">
-                  <SongBody body={draft.body} mode="both" shift={shift} preferFlats={preferFlats} />
+                  <SongBody
+                    body={draft.body}
+                    mode="both"
+                    shift={shift}
+                    preferFlats={preferFlats}
+                    sectionNames={t.sections.names}
+                  />
                 </div>
               </div>
               <div className="flex gap-3">
@@ -225,7 +228,13 @@ export function CopyView({ copy, playlist, t }: Props) {
               </div>
             </form>
           ) : (
-            <SongBody body={copy.body} mode={mode} shift={shift} preferFlats={preferFlats} />
+            <SongBody
+              body={copy.body}
+              mode={mode}
+              shift={shift}
+              preferFlats={preferFlats}
+              sectionNames={t.sections.names}
+            />
           )}
         </section>
 

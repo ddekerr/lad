@@ -168,7 +168,14 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
 
       <main ref={scrollRef} onClick={onTapText} className="flex-1 cursor-pointer overflow-y-auto px-4 py-8 sm:px-12">
         <div className="mx-auto max-w-4xl pb-[60vh]">
-          <SongBody body={body} mode="both" shift={shift} preferFlats={preferFlats} textSize={size} />
+          <SongBody
+            body={body}
+            mode="both"
+            shift={shift}
+            preferFlats={preferFlats}
+            textSize={size}
+            sectionNames={t.sections.names}
+          />
         </div>
       </main>
 

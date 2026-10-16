@@ -192,6 +192,21 @@ const en = {
     standalone: 'Own song, not linked to the catalog.',
     failed: 'Could not save. Try again.',
   },
+  sections: {
+    toolbar: 'Sections',
+    insert: 'Insert before the current line',
+    names: {
+      intro: 'Intro',
+      verse: 'Verse',
+      'pre-chorus': 'Pre-chorus',
+      chorus: 'Chorus',
+      bridge: 'Bridge',
+      solo: 'Solo',
+      outro: 'Outro',
+    },
+    hint: 'A section marker is a line of its own, like {chorus} or {verse: Verse 2}. It lasts until the next marker.',
+    unknown: 'Unknown section type on line {line}: {text}',
+  },
   editor: {
     newSong: 'Add song',
     editSong: 'Edit song',
@@ -442,6 +457,21 @@ const uk: Dictionary = {
     deleteCopyConfirm: 'Видалити цю копію з плейлиста?',
     standalone: "Власна пісня, без зв'язку з каталогом.",
     failed: 'Не вдалося зберегти. Спробуй ще раз.',
+  },
+  sections: {
+    toolbar: 'Розділи',
+    insert: 'Вставити перед поточним рядком',
+    names: {
+      intro: 'Вступ',
+      verse: 'Куплет',
+      'pre-chorus': 'Пре-приспів',
+      chorus: 'Приспів',
+      bridge: 'Бридж',
+      solo: 'Програш',
+      outro: 'Закінчення',
+    },
+    hint: 'Мітка розділу це окремий рядок, наприклад {chorus} або {verse: Куплет 2}. Розділ триває до наступної мітки.',
+    unknown: 'Невідомий тип розділу в рядку {line}: {text}',
   },
   editor: {
     newSong: 'Додати пісню',
