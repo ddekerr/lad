@@ -15,7 +15,7 @@ function isErrorKey(t: Dictionary, key: string | undefined): key is ErrorKey {
 const inputClass =
   'h-12 w-full rounded-tile border border-line bg-ink px-3.5 text-base text-cream placeholder:text-dim';
 const primaryButton =
-  'min-h-12 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-60';
+  'min-h-12 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim';
 
 /** Вхід: Google або email із одноразовим кодом. Реєстрація й вхід це один потік. */
 export function SignInForm({ t, initialError }: Props) {

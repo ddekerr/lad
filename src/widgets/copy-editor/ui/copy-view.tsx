@@ -25,7 +25,8 @@ type Props = {
   t: Dictionary;
 };
 
-const primary = 'min-h-11 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-50';
+const primary =
+  'min-h-11 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim';
 const secondary = 'min-h-11 rounded-tile bg-line px-5 font-semibold text-cream hover:bg-taupe hover:text-ink';
 
 /**
