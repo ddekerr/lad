@@ -109,7 +109,7 @@ export function MusicRolesAdmin({ roles, t }: Props) {
               type="button"
               disabled={busy}
               onClick={() => askDelete(role)}
-              className="min-h-10 rounded-tile border border-danger px-4 text-sm font-semibold text-danger hover:bg-line disabled:opacity-60"
+              className="min-h-10 rounded-tile border border-danger px-4 text-sm font-semibold text-danger hover:bg-line disabled:border-line disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
             >
               {t.admin.delete}
             </button>
@@ -133,7 +133,7 @@ export function MusicRolesAdmin({ roles, t }: Props) {
               type="button"
               disabled={busy}
               onClick={doDelete}
-              className="min-h-11 flex-1 rounded-tile bg-danger px-5 font-semibold text-ink disabled:opacity-60"
+              className="min-h-11 flex-1 rounded-tile bg-danger px-5 font-semibold text-ink disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
             >
               {t.admin.deleteConfirm}
             </button>
@@ -172,7 +172,7 @@ export function MusicRolesAdmin({ roles, t }: Props) {
         <button
           type="submit"
           disabled={busy}
-          className="min-h-12 self-start rounded-tile bg-amber px-6 font-semibold text-ink hover:bg-amber-active disabled:opacity-60"
+          className="min-h-12 self-start rounded-tile bg-amber px-6 font-semibold text-ink hover:bg-amber-active disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
         >
           {t.admin.create}
         </button>
