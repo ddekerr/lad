@@ -25,6 +25,12 @@ enum Language {
   uk
 }
 
+enum PartDifficulty {
+  easy
+  medium
+  hard
+}
+
 model User {
   id          String    @id @default(cuid())
   email       String    @unique
@@ -38,6 +44,7 @@ model User {
   roles         UserRole[]     @relation("RoleOwner")
   grantedRoles  UserRole[]     @relation("RoleGrantedBy")
   playlists     Playlist[]
+  generations   PartGeneration[]
   createdSongs  Song[]         @relation("SongCreatedBy")
   updatedSongs  Song[]         @relation("SongUpdatedBy")
 
@@ -183,10 +190,46 @@ model SongCopy {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
-  sourceSong Song?    @relation(fields: [sourceSongId], references: [id], onDelete: SetNull)
+  playlist   Playlist   @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  sourceSong Song?      @relation(fields: [sourceSongId], references: [id], onDelete: SetNull)
+  parts      CopyPart[]
 
   @@index([playlistId, position])
   @@index([sourceSongId])
   @@map("song_copies")
+}
+
+/// Партія для інструмента, згенерована ШІ для копії пісні. Одна на інструмент і рівень складності.
+model CopyPart {
+  id            String         @id @default(cuid())
+  copyId        String
+  /// Поки лише "bass"
+  instrument    String
+  difficulty    PartDifficulty
+  /// Хеш входу генерації (такти, акорди, темп, розмір, динаміка, версія запиту); інший хеш означає, що партія застаріла
+  inputHash     String
+  /// Модель, що написала партію
+  model         String
+  promptVersion Int
+  /// {"bars": [{"bar": 1, "chords": ["Am"], "notes": [{"beat": 1, "length": 4, "pitch": "A1"}]}]}
+  data          Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  copy SongCopy @relation(fields: [copyId], references: [id], onDelete: Cascade)
+
+  @@unique([copyId, instrument, difficulty])
+  @@map("copy_parts")
+}
+
+/// Журнал генерацій для добового ліміту на користувача
+model PartGeneration {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("part_generations")
 }

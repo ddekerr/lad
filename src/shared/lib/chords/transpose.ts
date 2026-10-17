@@ -75,3 +75,15 @@ export function transposeChord(chord: string, semitones: number, preferFlats = f
   const bass = bassLetter ? '/' + noteName(noteIndex(bassLetter, bassAccidental) + semitones, preferFlats) : '';
   return root + quality + bass;
 }
+
+/**
+ * Клас висоти (0..11, C = 0) найнижчої ноти акорда: бас після скісної риски, а без нього основна нота.
+ * Невпізнаний акорд дає null.
+ */
+export function chordBassPitchClass(chord: string): number | null {
+  const match = CHORD_RE.exec(chord.trim());
+  if (!match) return null;
+  const [, rootLetter, rootAccidental, quality, bassLetter, bassAccidental] = match;
+  if (!QUALITY_RE.test(quality)) return null;
+  return bassLetter ? noteIndex(bassLetter, bassAccidental) : noteIndex(rootLetter, rootAccidental);
+}

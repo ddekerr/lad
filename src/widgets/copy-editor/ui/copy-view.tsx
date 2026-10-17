@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { BodyField, SongBody, type DisplayMode } from '@/entities/song';
-import type { CopyState, SectionDynamics } from '@/entities/song-copy';
+import type { CopyState, PartView, SectionDynamics } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
 import { IconChevronLeft, IconExpand, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
 import { CopyParameters } from './copy-parameters';
+import { CopyParts } from './copy-parts';
 
 type Props = {
   copy: {
@@ -26,6 +27,8 @@ type Props = {
     state: CopyState;
   };
   playlist: { id: string; name: string };
+  parts: PartView[];
+  canGenerate: boolean;
   t: Dictionary;
 };
 
@@ -37,7 +40,7 @@ const secondary = 'min-h-11 rounded-tile bg-line px-5 font-semibold text-cream h
  * Моя копія: тональність і нотатки зберігаються в самій копії, правки тексту живуть
  * лише в ній. Одна кнопка «Оновити згідно з оригіналом» замінює назву, текст і акорди.
  */
-export function CopyView({ copy, playlist, t }: Props) {
+export function CopyView({ copy, playlist, parts, canGenerate, t }: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<DisplayMode>('both');
   const [shift, setShift] = useState(copy.keyShift);
@@ -365,6 +368,8 @@ export function CopyView({ copy, playlist, t }: Props) {
         initial={{ bpm: copy.bpm, timeSignature: copy.timeSignature, sectionDynamics: copy.sectionDynamics }}
         t={t}
       />
+
+      <CopyParts copyId={copy.id} parts={parts} canGenerate={canGenerate} t={t} />
     </main>
   );
 }
