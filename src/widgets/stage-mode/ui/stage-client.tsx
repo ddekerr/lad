@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SongBody } from '@/entities/song';
+import { buildPartTab, PartTab, type PartDifficulty, type PartView } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
 import { IconChevronLeft, IconChevronRight, IconClose, IconMinus, IconPause, IconPlay, IconPlus } from '@/shared/ui';
@@ -16,6 +17,8 @@ type Props = {
   /** Сусідні пісні плейлиста (лише для копій) */
   prev?: { href: string; title: string } | null;
   next?: { href: string; title: string } | null;
+  /** Партії копії: якщо є, у режимі сцени з'являється перемикач «акорди / партія» */
+  parts?: PartView[];
   t: Dictionary;
 };
 
@@ -27,7 +30,10 @@ const HIDE_BARS_AFTER_MS = 3000;
  * Режим сцени: темний повноекранний вигляд, великий текст, автопрокрутка,
  * зміна розміру шрифту й тональності. Дотик на текст ставить прокрутку на паузу.
  */
-export function StageClient({ title, originalKey, body, initialShift, backHref, prev, next, t }: Props) {
+export function StageClient({ title, originalKey, body, initialShift, backHref, prev, next, parts = [], t }: Props) {
+  const [view, setView] = useState<'chords' | 'part'>('chords');
+  const [level, setLevel] = useState<PartDifficulty | null>(parts[0]?.difficulty ?? null);
+  const activePart = parts.find((part) => part.difficulty === level) ?? parts[0] ?? null;
   const [size, setSize] = useState(36);
   const [shift, setShift] = useState(((initialShift % 12) + 12) % 12);
   const [speed, setSpeed] = useState(4);
@@ -106,76 +112,126 @@ export function StageClient({ title, originalKey, body, initialShift, backHref, 
 
   return (
     <div className="fixed inset-0 flex flex-col bg-ink text-cream">
-      <header
-        className={`${barClass} flex min-h-16 items-center justify-between gap-3 border-b border-line px-3 sm:px-6`}
-      >
-        <div className="flex min-w-0 items-center gap-3">
-          <Link
-            href={backHref}
-            aria-label={t.stage.close}
-            className="flex size-11 flex-none items-center justify-center rounded-xl bg-line"
-          >
-            <IconClose size={22} />
-          </Link>
-          <div className="truncate font-semibold">{title}</div>
-        </div>
+      <div className={`${barClass} border-b border-line`}>
+        <header className="flex min-h-16 items-center justify-between gap-3 px-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link
+              href={backHref}
+              aria-label={t.stage.close}
+              className="flex size-11 flex-none items-center justify-center rounded-xl bg-line"
+            >
+              <IconClose size={22} />
+            </Link>
+            <div className="truncate font-semibold">{title}</div>
+          </div>
 
-        <div className="flex flex-none items-center gap-2 sm:gap-5">
-          <div role="group" aria-label={t.stage.larger} className="flex items-center gap-1.5">
-            <button
-              type="button"
-              aria-label={t.stage.smaller}
-              onClick={() => setSize((s) => Math.max(MIN_SIZE, s - 4))}
-              className="size-11 rounded-xl bg-taupe font-bold text-ink"
-            >
-              A−
-            </button>
-            <button
-              type="button"
-              aria-label={t.stage.larger}
-              onClick={() => setSize((s) => Math.min(MAX_SIZE, s + 4))}
-              className="size-11 rounded-xl bg-taupe text-lg font-bold text-ink"
-            >
-              A+
-            </button>
-          </div>
-          <div role="group" aria-label={t.stage.key} className="flex items-center gap-1.5">
-            <button
-              type="button"
-              aria-label={t.stage.transposeDown}
-              onClick={() => step(-1)}
-              className="flex size-11 items-center justify-center rounded-xl bg-taupe text-ink"
-            >
-              <IconMinus size={20} />
-            </button>
-            <div
-              aria-live="polite"
-              className="flex h-11 min-w-12 items-center justify-center rounded-xl bg-surface px-2 font-heading font-bold"
-            >
-              {currentKey}
+          <div className="flex flex-none items-center gap-2 sm:gap-5">
+            <div role="group" aria-label={t.stage.larger} className="flex items-center gap-1.5">
+              <button
+                type="button"
+                aria-label={t.stage.smaller}
+                onClick={() => setSize((s) => Math.max(MIN_SIZE, s - 4))}
+                className="size-11 rounded-xl bg-taupe font-bold text-ink"
+              >
+                A−
+              </button>
+              <button
+                type="button"
+                aria-label={t.stage.larger}
+                onClick={() => setSize((s) => Math.min(MAX_SIZE, s + 4))}
+                className="size-11 rounded-xl bg-taupe text-lg font-bold text-ink"
+              >
+                A+
+              </button>
             </div>
-            <button
-              type="button"
-              aria-label={t.stage.transposeUp}
-              onClick={() => step(1)}
-              className="flex size-11 items-center justify-center rounded-xl bg-taupe text-ink"
-            >
-              <IconPlus size={20} />
-            </button>
+            <div role="group" aria-label={t.stage.key} className="flex items-center gap-1.5">
+              <button
+                type="button"
+                aria-label={t.stage.transposeDown}
+                onClick={() => step(-1)}
+                className="flex size-11 items-center justify-center rounded-xl bg-taupe text-ink"
+              >
+                <IconMinus size={20} />
+              </button>
+              <div
+                aria-live="polite"
+                className="flex h-11 min-w-12 items-center justify-center rounded-xl bg-surface px-2 font-heading font-bold"
+              >
+                {currentKey}
+              </div>
+              <button
+                type="button"
+                aria-label={t.stage.transposeUp}
+                onClick={() => step(1)}
+                className="flex size-11 items-center justify-center rounded-xl bg-taupe text-ink"
+              >
+                <IconPlus size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+
+        {activePart && (
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-3 pb-3 sm:px-6">
+            <div role="group" aria-label={t.stage.view} className="flex gap-1.5">
+              {(['chords', 'part'] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={view === value}
+                  onClick={() => setView(value)}
+                  className={
+                    'min-h-11 rounded-xl px-4 font-semibold ' +
+                    (view === value ? 'bg-amber text-ink' : 'bg-line text-cream hover:bg-taupe hover:text-ink')
+                  }
+                >
+                  {value === 'chords' ? t.stage.viewChords : t.stage.viewPart}
+                </button>
+              ))}
+            </div>
+            {view === 'part' && parts.length > 1 && (
+              <div role="group" aria-label={t.stage.level} className="flex gap-1.5">
+                {parts.map((part) => (
+                  <button
+                    key={part.difficulty}
+                    type="button"
+                    aria-pressed={activePart.difficulty === part.difficulty}
+                    onClick={() => setLevel(part.difficulty)}
+                    className={
+                      'min-h-11 rounded-xl px-4 ' +
+                      (activePart.difficulty === part.difficulty
+                        ? 'bg-taupe font-semibold text-ink'
+                        : 'bg-line text-cream hover:bg-taupe hover:text-ink')
+                    }
+                  >
+                    {t.parts[part.difficulty]}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <main ref={scrollRef} onClick={onTapText} className="flex-1 cursor-pointer overflow-y-auto px-4 py-8 sm:px-12">
         <div className="mx-auto max-w-4xl pb-[60vh]">
-          <SongBody
-            body={body}
-            mode="both"
-            shift={shift}
-            preferFlats={preferFlats}
-            textSize={size}
-            sectionNames={t.sections.names}
-          />
+          {view === 'part' && activePart ? (
+            <PartTab
+              tab={buildPartTab(activePart.data, originalKey, shift)}
+              size={Math.round(size * 0.6)}
+              label={t.parts.tabLabel}
+              sectionLabel={(id) => (t.sections.names as Record<string, string>)[id] ?? id}
+            />
+          ) : (
+            <SongBody
+              body={body}
+              mode="both"
+              shift={shift}
+              preferFlats={preferFlats}
+              textSize={size}
+              sectionNames={t.sections.names}
+            />
+          )}
         </div>
       </main>
 

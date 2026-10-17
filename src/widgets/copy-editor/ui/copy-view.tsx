@@ -369,7 +369,14 @@ export function CopyView({ copy, playlist, parts, canGenerate, t }: Props) {
         t={t}
       />
 
-      <CopyParts copyId={copy.id} parts={parts} canGenerate={canGenerate} t={t} />
+      <CopyParts
+        copyId={copy.id}
+        originalKey={copy.originalKey}
+        shift={shift}
+        parts={parts}
+        canGenerate={canGenerate}
+        t={t}
+      />
     </main>
   );
 }

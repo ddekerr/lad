@@ -62,6 +62,10 @@ const en = {
     prev: 'Previous song',
     next: 'Next song',
     tapHint: 'Tap the text to pause or resume. Bars hide while scrolling.',
+    view: 'View',
+    viewChords: 'Chords',
+    viewPart: 'Bass part',
+    level: 'Difficulty',
   },
   auth: {
     title: 'Sign in',
@@ -254,7 +258,9 @@ const en = {
     remove: 'Delete',
     removeConfirm: 'Delete this part?',
     cancel: 'Cancel',
-    howToRead: 'Each line is: beat, note and its length in beats. The part is in the key you play.',
+    howToRead:
+      'Four lines are the bass strings (top to bottom: G D A E), numbers are frets, 0 is an open string. The bar under the lines shows how long the note lasts. The part follows the key you play: transposing changes the part too.',
+    tabLabel: 'Bass tablature',
     bar: 'Bar',
     notReady:
       'Fill in tempo, time signature and dynamics for every section, and fix the bars above, then you can generate.',
@@ -390,6 +396,10 @@ const uk: Dictionary = {
     prev: 'Попередня пісня',
     next: 'Наступна пісня',
     tapHint: 'Торкнись тексту, щоб поставити на паузу чи продовжити. Панелі ховаються під час прокрутки.',
+    view: 'Вигляд',
+    viewChords: 'Акорди',
+    viewPart: 'Партія баса',
+    level: 'Складність',
   },
   auth: {
     title: 'Вхід',
@@ -582,7 +592,9 @@ const uk: Dictionary = {
     remove: 'Видалити',
     removeConfirm: 'Видалити цю партію?',
     cancel: 'Скасувати',
-    howToRead: 'У кожному рядку: доля, нота і її тривалість у долях. Партія в тій тональності, яку ти граєш.',
+    howToRead:
+      'Чотири лінії це струни баса (зверху вниз: G D A E), цифри це лади, 0 це відкрита струна. Смужка під лініями показує, скільки триває нота. Партія йде в тій тональності, яку ти граєш: транспонування змінює й партію.',
+    tabLabel: 'Табулатура баса',
     bar: 'Такт',
     notReady: 'Заповни темп, розмір і динаміку кожного розділу та виправ такти вище, тоді можна генерувати.',
     errors: {

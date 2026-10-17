@@ -57,7 +57,14 @@ export async function generateBassPart(
 
     if (result.ok) {
       const data: PartData = {
-        bars: input.bars.map((bar, i) => ({ bar: bar.bar, chords: bar.chords, notes: result.notes[i] })),
+        timeSignature: input.timeSignature,
+        shift: input.shift,
+        bars: input.bars.map((bar, i) => ({
+          bar: bar.bar,
+          section: bar.section,
+          chords: bar.chords,
+          notes: result.notes[i],
+        })),
       };
       return { ok: true, data, attempts: attempt };
     }

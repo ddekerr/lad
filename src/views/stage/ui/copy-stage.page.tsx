@@ -5,6 +5,7 @@ import { neighbours } from '@/entities/song-copy';
 import { getCurrentUser } from '@/server/auth/session';
 import { prisma } from '@/server/db';
 import { getDictionary } from '@/server/i18n';
+import { listCopyParts } from '@/server/parts/service';
 import { getOwnedCopy } from '@/server/playlists';
 
 export const metadata: Metadata = { title: 'Stage' };
@@ -25,6 +26,7 @@ export default async function CopyStagePage({ params }: Props) {
     orderBy: { position: 'asc' },
     select: { id: true, title: true },
   });
+  const parts = await listCopyParts(copy);
   const current = siblings.find((c) => c.id === copy.id);
   const { prev, next } = current ? neighbours(siblings, current) : { prev: null, next: null };
   const link = (c: { id: string; title: string } | null) =>
@@ -40,6 +42,7 @@ export default async function CopyStagePage({ params }: Props) {
       backHref={`/copies/${copy.id}`}
       prev={link(prev)}
       next={link(next)}
+      parts={parts}
       t={t}
     />
   );

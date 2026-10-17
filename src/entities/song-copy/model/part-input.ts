@@ -26,6 +26,8 @@ export type GenerationInput = {
   instrument: 'bass';
   difficulty: PartDifficulty;
   key: string;
+  /** Зсув копії, з яким зроблено вхід (у запит до моделі не йде) */
+  shift: number;
   timeSignature: string;
   beatsPerBar: number;
   bpm: number;
@@ -65,6 +67,7 @@ export function buildGenerationInput(copy: CopyForParts, difficulty: PartDifficu
       instrument: 'bass',
       difficulty,
       key: transposeKey(copy.originalKey, copy.keyShift),
+      shift: copy.keyShift,
       timeSignature: signature,
       beatsPerBar: Number(signature.split('/')[0]),
       bpm: copy.bpm as number,

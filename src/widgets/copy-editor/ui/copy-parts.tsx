@@ -2,11 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { PART_DIFFICULTIES, type PartDifficulty, type PartView } from '@/entities/song-copy';
+import { buildPartTab, PART_DIFFICULTIES, PartTab, type PartDifficulty, type PartView } from '@/entities/song-copy';
 import { fmt, type Dictionary } from '@/shared/i18n';
 
 type Props = {
   copyId: string;
+  originalKey: string;
+  /** Поточний зсув тональності копії: партія показується в ній */
+  shift: number;
   parts: PartView[];
   /** Збережені налаштування копії дозволяють генерацію */
   canGenerate: boolean;
@@ -26,7 +29,7 @@ function errorText(t: Dictionary, data: ApiError | null): string {
 }
 
 /** Партії баса для копії: три рівні, генерація ШІ, показ по тактах, видалення. */
-export function CopyParts({ copyId, parts, canGenerate, t }: Props) {
+export function CopyParts({ copyId, originalKey, shift, parts, canGenerate, t }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<PartDifficulty | null>(null);
   const [error, setError] = useState<{ level: PartDifficulty; text: string } | null>(null);
@@ -143,25 +146,14 @@ export function CopyParts({ copyId, parts, canGenerate, t }: Props) {
               {part && open === level && (
                 <div className="flex flex-col gap-2">
                   <p className="text-xs text-muted">{t.parts.howToRead}</p>
-                  <ol className="flex flex-col divide-y divide-line">
-                    {part.data.bars.map((bar) => (
-                      <li key={bar.bar} className="flex flex-col gap-1 py-2 sm:flex-row sm:gap-4">
-                        <div className="flex-none sm:w-40">
-                          <span className="text-sm text-muted">
-                            {t.parts.bar} {bar.bar}
-                          </span>{' '}
-                          <span className="font-bold text-amber">{bar.chords.join(' ')}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-sm">
-                          {bar.notes.map((note, i) => (
-                            <span key={i}>
-                              {note.beat}: <b>{note.pitch}</b> ({note.length})
-                            </span>
-                          ))}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
+                  <div className="overflow-x-auto pb-2">
+                    <PartTab
+                      tab={buildPartTab(part.data, originalKey, shift)}
+                      size={18}
+                      label={t.parts.tabLabel}
+                      sectionLabel={(id) => (t.sections.names as Record<string, string>)[id] ?? id}
+                    />
+                  </div>
                 </div>
               )}
             </li>

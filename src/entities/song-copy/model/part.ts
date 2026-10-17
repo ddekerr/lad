@@ -33,12 +33,20 @@ export type PartNote = {
 
 export type PartBar = {
   bar: number;
+  /** Ідентифікатор розділу пісні (для заголовків у табулатурі) */
+  section?: string;
   /** Акорди такту (для показу); при збереженні їх додає сервер */
   chords: string[];
   notes: PartNote[];
 };
 
-export type PartData = { bars: PartBar[] };
+export type PartData = {
+  bars: PartBar[];
+  /** Розмір такту, для якого зроблено партію («4/4») */
+  timeSignature?: string;
+  /** Зсув копії (0..11), у якому записано ноти й акорди партії: від нього рахується транспонування */
+  shift?: number;
+};
 
 /** Партія для показу: дані, чи вона ще відповідає копії, і коли оновлена. */
 export type PartView = {

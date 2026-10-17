@@ -39,7 +39,14 @@ describe('generateBassPart', () => {
     assert.equal(result.ok, true);
     if (result.ok) {
       assert.equal(result.attempts, 1);
-      assert.deepEqual(result.data.bars[0], { bar: 1, chords: ['Am'], notes: [{ beat: 1, length: 4, pitch: 'A1' }] });
+      assert.deepEqual(result.data.bars[0], {
+        bar: 1,
+        section: 'verse',
+        chords: ['Am'],
+        notes: [{ beat: 1, length: 4, pitch: 'A1' }],
+      });
+      assert.equal(result.data.timeSignature, '4/4');
+      assert.equal(result.data.shift, input.shift);
     }
   });
 
