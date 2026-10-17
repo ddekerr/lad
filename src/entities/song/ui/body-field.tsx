@@ -78,6 +78,7 @@ export function BodyField({ label, hint, value, onChange, rows = 18, t }: Props)
       />
       <span className="text-xs text-muted">{hint}</span>
       <span className="text-xs text-muted">{t.sections.hint}</span>
+      <span className="text-xs text-muted">{t.bars.hint}</span>
       {issues.length > 0 && (
         <ul role="alert" className="flex flex-col gap-1 text-sm text-danger">
           {issues.map((issue) => (

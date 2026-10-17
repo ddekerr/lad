@@ -12,6 +12,7 @@ import {
   type SectionDynamics,
 } from '@/entities/song-copy';
 import { fmt, type Dictionary } from '@/shared/i18n';
+import { parseBars, validateBars, type BarIssue } from '@/shared/lib/bars';
 import { IMPLICIT_SECTION_ID, listSections } from '@/shared/lib/sections';
 
 type Props = {
@@ -73,11 +74,23 @@ export function CopyParameters({ copyId, body, initial, t }: Props) {
     if (res?.ok) router.refresh();
   }
 
+  const { marked, bars } = parseBars(body);
+  const barIssues = signature ? (validateBars(bars, signature) ?? []) : null;
+  const MAX_SHOWN_ISSUES = 8;
+  const issueText = (issue: BarIssue) =>
+    fmt(issue.code === 'uneven' ? t.bars.uneven : t.bars.noChord, {
+      bar: issue.bar,
+      line: issue.line,
+      chords: issue.chords,
+      beats: issue.beats,
+    });
+
   const missingList = [
     missing.bpm && t.parameters.bpm,
     missing.timeSignature && t.parameters.timeSignature,
     missing.sections.length > 0 &&
       fmt(t.parameters.missingDynamics, { sections: missing.sections.map((id) => nameById.get(id) ?? id).join(', ') }),
+    barIssues && barIssues.length > 0 && fmt(t.bars.problemsCount, { count: barIssues.length }),
   ].filter(Boolean);
 
   return (
@@ -125,6 +138,26 @@ export function CopyParameters({ copyId, body, initial, t }: Props) {
           </select>
           <span className="text-xs text-muted">{t.parameters.timeSignatureHint}</span>
         </label>
+      </div>
+
+      <div className="flex flex-col gap-1 text-sm">
+        <p className="text-muted">
+          {bars.length === 0 ? t.bars.noBars : fmt(marked ? t.bars.marked : t.bars.unmarked, { count: bars.length })}
+        </p>
+        {barIssues === null && bars.length > 0 && <p className="text-muted">{t.bars.pickSignature}</p>}
+        {barIssues !== null && barIssues.length === 0 && bars.length > 0 && (
+          <p className="text-success">{t.bars.allFine}</p>
+        )}
+        {barIssues !== null && barIssues.length > 0 && (
+          <ul role="alert" className="flex flex-col gap-1 text-danger">
+            {barIssues.slice(0, MAX_SHOWN_ISSUES).map((issue) => (
+              <li key={issue.bar}>{issueText(issue)}</li>
+            ))}
+            {barIssues.length > MAX_SHOWN_ISSUES && (
+              <li>{fmt(t.bars.more, { count: barIssues.length - MAX_SHOWN_ISSUES })}</li>
+            )}
+          </ul>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
