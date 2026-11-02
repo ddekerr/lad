@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Нова пісня. Лише Editor. */
-export default async function NewSongPage() {
+export async function NewSongPage() {
   const [user, { t }] = await Promise.all([getCurrentUser(), getDictionary()]);
   if (!user) redirect('/sign-in');
   if (!can(user.actor, 'song:write')) return <Forbidden t={t} />;

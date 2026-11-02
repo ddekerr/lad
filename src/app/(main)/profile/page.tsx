@@ -1,3 +1,1 @@
-export { ProfilePage as default, generateProfileMetadata as generateMetadata } from '@/views/profile';
-
-export const dynamic = 'force-dynamic';
+export { ProfilePage as default, generateMetadata } from '@/views/profile/profile.page';

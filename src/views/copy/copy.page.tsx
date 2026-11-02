@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: 'Лад · Copy' };
 type Props = { params: Promise<{ id: string }> };
 
 /** Моя копія пісні: перегляд, тональність, нотатки, правки, оновлення з оригіналу. */
-export default async function CopyPage({ params }: Props) {
+export async function CopyPage({ params }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect('/sign-in');
 

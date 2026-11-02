@@ -1,3 +1,1 @@
-export { EditSongPage as default, generateEditSongMetadata as generateMetadata } from '@/views/song-editor';
-
-export const dynamic = 'force-dynamic';
+export { EditSongPage as default, generateMetadata } from '@/views/song-editor/edit-song.page';

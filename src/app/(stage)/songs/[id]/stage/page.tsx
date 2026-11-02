@@ -1,3 +1,1 @@
-export { SongStagePage as default, generateSongStageMetadata as generateMetadata } from '@/views/stage';
-
-export const dynamic = 'force-dynamic';
+export { SongStagePage as default, generateMetadata } from '@/views/stage/song-stage.page';

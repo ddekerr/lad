@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: 'Stage' };
 type Props = { params: Promise<{ id: string }> };
 
 /** Режим сцени для моєї копії; стрілки ведуть до сусідніх пісень плейлиста. Зсув беремо з копії. */
-export default async function CopyStagePage({ params }: Props) {
+export async function CopyStagePage({ params }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect('/sign-in');
 

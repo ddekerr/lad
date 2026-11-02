@@ -11,13 +11,16 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { email?: unknown } | null;
   const email = normalizeEmail(body?.email);
+
   if (!email) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 400 });
   }
 
   const result = await requestLoginCode(email);
+
   if (result === 'rate_limited') {
     return NextResponse.json({ error: 'too_many_requests' }, { status: 429 });
   }
+
   return NextResponse.json({ ok: true });
 }

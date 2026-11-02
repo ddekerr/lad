@@ -1,3 +1,1 @@
-export { MusicRolesPage as default, generateMusicRolesMetadata as generateMetadata } from '@/views/users-roles';
-
-export const dynamic = 'force-dynamic';
+export { MusicRolesPage as default, generateMetadata } from '@/views/users-roles/music-roles.page';

@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Props = { searchParams: Promise<{ search?: string }> };
 
 /** Користувачі й ролі: видача й зняття ролей. Лише адмін. */
-export default async function UsersPage({ searchParams }: Props) {
+export async function UsersPage({ searchParams }: Props) {
   const [user, { locale, t }, { search }] = await Promise.all([getCurrentUser(), getDictionary(), searchParams]);
   if (!user) redirect('/sign-in');
   if (!can(user.actor, 'users:read')) return <Forbidden t={t} />;

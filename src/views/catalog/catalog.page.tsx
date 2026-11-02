@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Props = { searchParams: Promise<{ q?: string }> };
 
 /** Каталог пісень (головна). Публічний: доступний гостю без входу. */
-export default async function CatalogPage({ searchParams }: Props) {
+export async function CatalogPage({ searchParams }: Props) {
   const [{ t }, user] = await Promise.all([getDictionary(), getCurrentUser()]);
   const { q } = await searchParams;
   const query = q?.trim() ?? '';

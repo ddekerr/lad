@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /** Режим сцени для пісні з бази. Тональність передається з екрана пісні в query `shift`. */
-export default async function SongStagePage({ params, searchParams }: Props) {
+export async function SongStagePage({ params, searchParams }: Props) {
   const { id } = await params;
   const { shift } = await searchParams;
   const [song, { t }] = await Promise.all([prisma.song.findFirst({ where: { id, deletedAt: null } }), getDictionary()]);

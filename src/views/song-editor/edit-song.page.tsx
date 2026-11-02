@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Props = { params: Promise<{ id: string }> };
 
 /** Редагування пісні. Лише Editor. */
-export default async function EditSongPage({ params }: Props) {
+export async function EditSongPage({ params }: Props) {
   const [user, { t }, { id }] = await Promise.all([getCurrentUser(), getDictionary(), params]);
   if (!user) redirect('/sign-in');
   if (!can(user.actor, 'song:write')) return <Forbidden t={t} />;

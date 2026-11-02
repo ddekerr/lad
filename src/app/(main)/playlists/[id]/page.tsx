@@ -1,3 +1,1 @@
-export { PlaylistPage as default, playlistMetadata as metadata } from '@/views/playlist';
-
-export const dynamic = 'force-dynamic';
+export { PlaylistItemPage as default, metadata } from '@/views/playlist/playlist-item.page';

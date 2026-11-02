@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Props = { searchParams: Promise<{ error?: string }> };
 
 /** Вхід / реєстрація: Google або email → код. Для вже авторизованого веде на головну. */
-export default async function SignInPage({ searchParams }: Props) {
+export async function SignInPage({ searchParams }: Props) {
   const [user, { t }, { error }] = await Promise.all([getCurrentUser(), getDictionary(), searchParams]);
   if (user) redirect('/');
 
