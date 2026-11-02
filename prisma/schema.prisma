@@ -4,9 +4,10 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  /// Пряме з'єднання для міграцій (через пулер вони зависають). Локально збігається з DATABASE_URL.
-  directUrl = env("DIRECT_URL")
+  /// З'єднання застосунку (може йти через пулер)
+  url       = env("DATABASE_URL_POOLING")
+  /// Пряме з'єднання для міграцій (через пулер вони зависають). Локально збігається з DATABASE_URL_POOLING.
+  directUrl = env("DATABASE_URL")
 }
 
 enum RoleKind {

@@ -14,7 +14,7 @@ type Props = {
 };
 
 const iconButton =
-  'flex size-11 flex-none items-center justify-center rounded-tile bg-line text-cream hover:bg-taupe hover:text-ink disabled:opacity-30';
+  'flex size-11 flex-none items-center justify-center rounded-tile bg-line text-cream hover:bg-taupe hover:text-ink disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim';
 
 /** Плейлист: порядок копій, перейменування, видалення, перехід до сцени. */
 export function PlaylistView({ playlist, copies: initial, t }: Props) {

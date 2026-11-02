@@ -74,7 +74,7 @@ export function AddToPlaylist({ songId, playlists, t }: Props) {
         type="button"
         onClick={add}
         disabled={busy}
-        className="min-h-11 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:opacity-50"
+        className="min-h-11 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
       >
         {t.song.addButton}
       </button>

@@ -44,7 +44,7 @@ export function PlaylistCreateForm({ musicRoleId, t }: { musicRoleId: string | n
         <button
           type="submit"
           disabled={busy || !name.trim()}
-          className="min-h-11 rounded-tile bg-amber px-6 font-semibold text-ink hover:bg-amber-active disabled:opacity-50"
+          className="min-h-11 rounded-tile bg-amber px-6 font-semibold text-ink hover:bg-amber-active disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
         >
           {t.playlists.create}
         </button>

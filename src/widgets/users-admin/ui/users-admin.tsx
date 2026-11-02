@@ -31,7 +31,8 @@ type Props = {
 
 type Pending = { role: AdminRole; playlists: number; copies: number };
 
-const buttonBase = 'min-h-11 rounded-tile px-5 font-semibold disabled:opacity-60';
+const buttonBase =
+  'min-h-11 rounded-tile px-5 font-semibold disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim';
 
 /** Список користувачів: розкрити картку, відмітити ролі, зберегти. */
 export function UsersAdmin({ users, roles, memberRoleName, actorIsSuper, t }: Props) {

@@ -126,7 +126,7 @@ export function SongEditor({ songId, initial, t }: Props) {
             <button
               type="submit"
               disabled={busy}
-              className="min-h-11 rounded-tile bg-amber px-6 font-semibold text-ink hover:bg-amber-active disabled:opacity-50"
+              className="min-h-11 rounded-tile bg-amber px-6 font-semibold text-ink hover:bg-amber-active disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
             >
               {busy ? t.editor.saving : t.editor.save}
             </button>

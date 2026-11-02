@@ -95,7 +95,7 @@ export function ImportSongs({ t }: { t: Dictionary }) {
         type="button"
         disabled={busy}
         onClick={() => fileInput.current?.click()}
-        className="flex min-h-11 items-center justify-center rounded-tile bg-line px-5 font-semibold hover:bg-taupe hover:text-ink disabled:opacity-50"
+        className="flex min-h-11 items-center justify-center rounded-tile bg-line px-5 font-semibold hover:bg-taupe hover:text-ink disabled:cursor-not-allowed disabled:bg-line disabled:text-dim disabled:hover:bg-line disabled:hover:text-dim"
       >
         {busy ? t.songImport.busy : t.songImport.button}
       </button>
