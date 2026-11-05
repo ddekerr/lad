@@ -45,6 +45,8 @@ model User {
   grantedRoles  UserRole[]     @relation("RoleGrantedBy")
   playlists     Playlist[]
   generations   PartGeneration[]
+  setlists      Setlist[]
+  stageSessions StageSession[]
   createdSongs  Song[]         @relation("SongCreatedBy")
   updatedSongs  Song[]         @relation("SongUpdatedBy")
 
@@ -142,6 +144,7 @@ model Song {
   createdBy User?      @relation("SongCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy User?      @relation("SongUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   copies    SongCopy[]
+  setlistItems SetlistItem[]
 
   @@index([title])
   @@index([artist])
@@ -232,4 +235,56 @@ model PartGeneration {
 
   @@index([userId, createdAt])
   @@map("part_generations")
+}
+
+/// Спільний список пісень на виступ: бачать і змінюють усі авторизовані
+model Setlist {
+  id          String   @id @default(cuid())
+  name        String
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  items     SetlistItem[]
+  sessions  StageSession[]
+
+  @@map("setlists")
+}
+
+model SetlistItem {
+  id         String @id @default(cuid())
+  setlistId  String
+  songId     String
+  position   Int
+  /// Тональність виступу: зсув від оригіналу в півтонах, 0..11
+  keyShift   Int    @default(0)
+
+  setlist Setlist @relation(fields: [setlistId], references: [id], onDelete: Cascade)
+  song    Song    @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@index([setlistId, position])
+  @@map("setlist_items")
+}
+
+/// Спільна сцена. Рядок завжди один (id = 'main'), тому одночасно вона запущена лише в однієї людини.
+model StageSession {
+  id          String   @id
+  setlistId   String
+  startedById String
+  /// Номер пісні в сетлісті, з нуля
+  itemIndex   Int      @default(0)
+  /// Номер такту в пісні, з нуля
+  bar         Int      @default(0)
+  /// Поточна тональність (зсув 0..11); ведучий може змінити її відносно сетліста
+  keyShift    Int      @default(0)
+  /// Зростає при кожній зміні: учасники питають лише про новіше
+  revision    Int      @default(1)
+  startedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  setlist   Setlist @relation(fields: [setlistId], references: [id], onDelete: Cascade)
+  startedBy User    @relation(fields: [startedById], references: [id], onDelete: Cascade)
+
+  @@map("stage_sessions")
 }

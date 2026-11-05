@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { type CopyState, moveItem, CopyStateBadge } from '@/entities/song-copy';
 import { fmt, type Dictionary } from '@/shared/i18n';
-import { IconArrowDown, IconArrowUp, IconChevronLeft, IconClose, IconExpand } from '@/shared/ui';
+import { IconArrowDown, IconArrowUp, IconChevronLeft, IconClose } from '@/shared/ui';
 
 type Props = {
   playlist: { id: string; name: string; roleLabel: string; roleId: string | null };
@@ -122,15 +122,6 @@ export function PlaylistView({ playlist, copies: initial, t }: Props) {
         >
           {t.playlists.addSongs}
         </Link>
-        {copies.length > 0 && (
-          <Link
-            href={`/copies/${copies[0].id}/stage`}
-            className="flex min-h-11 items-center gap-2 rounded-tile bg-line px-5 font-semibold"
-          >
-            <IconExpand size={18} />
-            {t.playlists.stage}
-          </Link>
-        )}
       </div>
 
       {error && (

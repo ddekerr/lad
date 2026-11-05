@@ -1,11 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { SongBody, type DisplayMode } from '@/entities/song';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
-import { IconExpand, IconMinus, IconPlus } from '@/shared/ui';
+import { IconMinus, IconPlus } from '@/shared/ui';
 
 type Props = {
   id: string;
@@ -96,14 +95,6 @@ export function SongView({ id, body, originalKey, t }: Props) {
           )}
           <p className="text-sm text-muted">{t.song.keyHint}</p>
         </div>
-
-        <Link
-          href={`/songs/${id}/stage?shift=${shift}`}
-          className="flex min-h-11 items-center justify-center gap-2 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
-        >
-          <IconExpand size={18} />
-          {t.song.stageMode}
-        </Link>
       </aside>
     </div>
   );

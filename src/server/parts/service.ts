@@ -93,3 +93,34 @@ export function savePart(args: {
 export function deletePart(copyId: string, difficulty: PartDifficulty) {
   return prisma.copyPart.deleteMany({ where: { copyId, instrument: INSTRUMENT_BASS, difficulty } });
 }
+
+/**
+ * Партії баса поточного користувача для пісень каталогу: беруться з його власної копії пісні
+ * (якщо копій кілька, береться та, що оновлювалась останньою й має партії). Потрібно для спільної сцени.
+ */
+export async function listPartsForSongs(
+  userId: string,
+  songIds: readonly string[],
+): Promise<Record<string, PartView[]>> {
+  if (songIds.length === 0) return {};
+  const withParts = await prisma.copyPart.findMany({
+    where: { instrument: INSTRUMENT_BASS, copy: { playlist: { userId }, sourceSongId: { in: [...songIds] } } },
+    orderBy: { updatedAt: 'desc' },
+    select: { copyId: true, copy: { select: { sourceSongId: true } } },
+  });
+
+  const copyBySong = new Map<string, string>();
+  for (const row of withParts) {
+    const songId = row.copy.sourceSongId;
+    if (songId && !copyBySong.has(songId)) copyBySong.set(songId, row.copyId);
+  }
+  if (copyBySong.size === 0) return {};
+
+  const copies = await prisma.songCopy.findMany({ where: { id: { in: [...copyBySong.values()] } } });
+  const result: Record<string, PartView[]> = {};
+  for (const copy of copies) {
+    const songId = copy.sourceSongId;
+    if (songId) result[songId] = await listCopyParts(copy);
+  }
+  return result;
+}

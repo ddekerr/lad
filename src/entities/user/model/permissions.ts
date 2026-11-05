@@ -20,6 +20,7 @@ export type Action =
   | 'song:read' // перегляд: усі, навіть гість
   | 'song:write' // додавати, змінювати, видаляти пісні
   | 'playlist:manage' // власні плейлисти й копії
+  | 'setlist:manage' // спільні сетлісти й запуск спільної сцени: усі авторизовані
   | 'users:read' // список користувачів
   | 'roles:assign' // видавати й знімати ролі
   | 'musicRoles:manage'; // довідник музичних ролей
@@ -37,6 +38,7 @@ export function can(actor: Actor | null, action: Action): boolean {
     case 'song:read':
       return true;
     case 'playlist:manage':
+    case 'setlist:manage':
       // Member є в усіх зареєстрованих, тож достатньо бути авторизованим
       return actor !== null;
     case 'song:write':

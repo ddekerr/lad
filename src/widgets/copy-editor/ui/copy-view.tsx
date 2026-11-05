@@ -7,7 +7,7 @@ import { BodyField, SongBody, type DisplayMode } from '@/entities/song';
 import type { CopyState, PartView, SectionDynamics } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
-import { IconChevronLeft, IconExpand, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
+import { IconChevronLeft, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
 import { CopyParameters } from './copy-parameters';
 import { CopyParts } from './copy-parts';
 
@@ -325,14 +325,6 @@ export function CopyView({ copy, playlist, parts, canGenerate, t }: Props) {
               {t.copy.edit}
             </button>
           )}
-
-          <Link
-            href={`/copies/${copy.id}/stage`}
-            className="flex min-h-11 items-center justify-center gap-2 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
-          >
-            <IconExpand size={18} />
-            {t.song.stageMode}
-          </Link>
 
           {confirmDelete ? (
             <div className="flex flex-col gap-3">

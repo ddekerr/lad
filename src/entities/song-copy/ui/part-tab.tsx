@@ -8,6 +8,10 @@ type Props = {
   sectionLabel?: (id: string) => string;
   /** Підпис для скрінрідера */
   label: string;
+  /** Номер такту в списку (з нуля), який підсвічується як поточний */
+  activeIndex?: number | null;
+  /** Дотик до такту: отримує його номер у списку (з нуля) */
+  onSelect?: (index: number) => void;
 };
 
 /**
@@ -15,10 +19,10 @@ type Props = {
  * акорди над тактом, під лініями смужки тривалості нот і позначки долей.
  * Кожен такт це окремий SVG, тому рядки переносяться самі за шириною контейнера.
  */
-export function PartTab({ tab, size = 20, sectionLabel, label }: Props) {
+export function PartTab({ tab, size = 20, sectionLabel, label, activeIndex = null, onSelect }: Props) {
   return (
     <div role="img" aria-label={label} className="flex flex-wrap items-end gap-y-3">
-      {tab.bars.map((bar) => (
+      {tab.bars.map((bar, index) => (
         <div key={bar.bar} className="contents">
           {bar.sectionStart && bar.section && (
             <div
@@ -28,14 +32,35 @@ export function PartTab({ tab, size = 20, sectionLabel, label }: Props) {
               {sectionLabel ? sectionLabel(bar.section) : bar.section}
             </div>
           )}
-          <BarTab bar={bar} beats={tab.beats} size={size} />
+          <BarTab
+            bar={bar}
+            index={index}
+            beats={tab.beats}
+            size={size}
+            active={activeIndex === index}
+            onSelect={onSelect}
+          />
         </div>
       ))}
     </div>
   );
 }
 
-function BarTab({ bar, beats, size }: { bar: TabBar; beats: number; size: number }) {
+function BarTab({
+  bar,
+  index,
+  beats,
+  size,
+  active,
+  onSelect,
+}: {
+  bar: TabBar;
+  index: number;
+  beats: number;
+  size: number;
+  active: boolean;
+  onSelect?: (index: number) => void;
+}) {
   const beatW = size * 1.6;
   const pad = size * 0.5;
   const width = beats * beatW + pad * 2;
@@ -55,8 +80,22 @@ function BarTab({ bar, beats, size }: { bar: TabBar; beats: number; size: number
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       aria-hidden="true"
-      className="-ml-px flex-none overflow-visible"
+      data-bar={index}
+      data-active={active ? 'true' : undefined}
+      onClick={onSelect ? () => onSelect(index) : undefined}
+      className={'-ml-px flex-none overflow-visible' + (onSelect ? ' cursor-pointer' : '')}
     >
+      {active && (
+        <rect
+          x={-size * 0.1}
+          y={0}
+          width={width + size * 0.2}
+          height={height}
+          rx={size * 0.4}
+          className="fill-surface stroke-amber"
+          strokeWidth={Math.max(2, size / 8)}
+        />
+      )}
       {BASS_STRINGS.map((string, i) => (
         <line
           key={string.name}
@@ -107,7 +146,13 @@ function BarTab({ bar, beats, size }: { bar: TabBar; beats: number; size: number
         const boxW = size * 0.62 * text.length + size * 0.3;
         return (
           <g key={i}>
-            <rect x={x - boxW / 2} y={y - size * 0.5} width={boxW} height={size} className="fill-ink" />
+            <rect
+              x={x - boxW / 2}
+              y={y - size * 0.5}
+              width={boxW}
+              height={size}
+              className={active ? 'fill-surface' : 'fill-ink'}
+            />
             <text
               x={x}
               y={y + size * 0.36}
