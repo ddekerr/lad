@@ -86,19 +86,28 @@
 
 ### 5.1 Підготовка
 
-Потрібні Node.js 20+ і PostgreSQL (локально чи хмарний).
+Потрібні Node.js 22 (на Windows запускайте з WSL саме Linux-версію Node, не Windows-ову) і Docker з Compose.
 
 ```bash
 git clone https://github.com/ddekerr/lad.git
 cd lad
-npm install
-cp .env.example .env     # заповни значення, див. розділ 5.2
-npx prisma migrate dev   # створює таблиці
+npm install              # postinstall генерує Prisma-клієнт
+npm run db:up            # PostgreSQL 16 у Docker, localhost:5432
+# створи .env.local з AUTH_SECRET і SUPER_ADMIN_EMAIL (див. нижче)
+npm run db:migrate       # створює таблиці
 npm run db:seed          # ролі (Member, Editor, Admin, басист, співак, піаніст) і три демо-пісні
 npm run dev              # http://localhost:3000
 ```
 
-Перший вхід у розробці: якщо `SMTP_HOST` порожній, код входу друкується в консоль, де запущено `npm run dev` (рядок `[mail:dev] Login code for …`). Вкажи свою пошту в `SUPER_ADMIN_EMAIL`, увійди нею, і ти отримаєш права адміна й супер-адміна. Роль Editor видає адмін на сторінці «Користувачі».
+**Як влаштовані налаштування розробки.**
+
+- `docker-compose.yml`: сервіс `db` (образ `postgres:16-alpine`, контейнер `lad-db`, том `lad-pgdata`, порт лише на `127.0.0.1`, перевірка готовності). Дані переживають `db:down`; повністю стерти базу можна командою `docker compose --env-file .env.development down -v`.
+- `.env.development` (у репозиторії, без секретів): логін, пароль і порт контейнера, `DATABASE_URL`, `DATABASE_URL_POOLING`, `APP_URL`. Next.js читає його у `next dev` сам.
+- `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env.development`. Шаблон усіх змінних у `.env.example`.
+- `scripts/with-env.mjs`: Prisma CLI читає лише `.env`, тому команди `db:migrate`, `db:seed`, `db:studio`, `db:reset` запускаються через цей скрипт, який підтягує `.env.local` і `.env.development`. Змінні, вже задані в оточенні, він не чіпає, тож у CI чи на сервері береться їхнє значення.
+- `.env` лишається для віддаленого середовища; у розробці його значення перекриваються файлами вище.
+
+Перший вхід у розробці: якщо `SMTP_HOST` порожній, код входу друкується в консоль, де запущено `npm run dev` (рядок `[mail:dev] Login code for …`). Вкажи свою пошту в `SUPER_ADMIN_EMAIL` (`.env.local`), увійди нею, і ти отримаєш права адміна й супер-адміна. Роль Editor видає адмін на сторінці «Користувачі».
 
 ### 5.2 Змінні середовища
 
@@ -119,24 +128,27 @@ npm run dev              # http://localhost:3000
 
 ### 5.3 Скрипти
 
-| Команда               | Що робить                                      |
-| --------------------- | ---------------------------------------------- |
-| `npm run dev`         | dev-сервер із Turbopack                        |
-| `npm run build`       | продакшен-збірка (`next build`)                |
-| `npm start`           | запуск зібраного застосунку                    |
-| `npm run lint`        | ESLint, включно з перевіркою архітектурних меж |
-| `npm run typecheck`   | `tsc --noEmit`                                 |
-| `npm test`            | юніт-тести (`tsx --test "src/**/*.test.ts"`)   |
-| `npm run format`      | Prettier по всьому репозиторію                 |
-| `npm run db:migrate`  | `prisma migrate dev`                           |
-| `npm run db:generate` | генерація клієнта Prisma                       |
-| `npm run db:seed`     | початкові дані                                 |
-| `npm run db:studio`   | Prisma Studio (перегляд БД)                    |
+| Команда                     | Що робить                                                  |
+| --------------------------- | ---------------------------------------------------------- |
+| `npm run dev`               | dev-сервер із Turbopack                                    |
+| `npm run build`             | продакшен-збірка (`next build`)                            |
+| `npm start`                 | запуск зібраного застосунку                                |
+| `npm run lint`              | ESLint, включно з перевіркою архітектурних меж             |
+| `npm run typecheck`         | `tsc --noEmit`                                             |
+| `npm test`                  | юніт-тести (`tsx --test "src/**/*.test.ts"`)               |
+| `npm run format`            | Prettier по всьому репозиторію                             |
+| `npm run db:migrate`        | `prisma migrate dev`                                       |
+| `npm run db:generate`       | генерація клієнта Prisma                                   |
+| `npm run db:seed`           | початкові дані                                             |
+| `npm run db:studio`         | Prisma Studio (перегляд БД)                                |
+| `npm run db:up` / `db:down` | запустити / зупинити локальну базу в Docker                |
+| `npm run db:reset`          | стерти локальну базу, накотити міграції й seed             |
+| `npm run db:migrate:deploy` | міграції у віддаленому середовищі (без `.env.development`) |
 
 ### 5.4 Продакшен
 
 1. Задай змінні з розділу 5.2: у продакшені обов'язкові `AUTH_SECRET` (без нього застосунок падає), SMTP, `APP_URL`.
-2. `npx prisma migrate deploy` (застосувати міграції), одноразово `npm run db:seed`.
+2. `npm run db:migrate:deploy` (застосувати міграції), одноразово `npm run db:seed`.
 3. `npm run build`, потім `npm start`.
 4. Cookie сесії в продакшені має прапорець `secure`, тож потрібен HTTPS.
 

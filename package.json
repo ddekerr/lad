@@ -11,10 +11,15 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test \"src/**/*.test.ts\"",
-    "db:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate",
+    "db:up": "docker compose --env-file .env.development up -d --wait db",
+    "db:down": "docker compose --env-file .env.development down",
+    "db:reset": "node scripts/with-env.mjs prisma migrate reset",
+    "db:migrate": "node scripts/with-env.mjs prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",
-    "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:seed": "node scripts/with-env.mjs prisma db seed",
+    "db:studio": "node scripts/with-env.mjs prisma studio"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

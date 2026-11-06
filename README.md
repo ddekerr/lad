@@ -14,17 +14,23 @@
 
 ## Швидкий старт
 
-Потрібні Node.js 20+ і PostgreSQL.
+Потрібні Node.js 22 (Linux-версія, у WSL не Windows-ова) і Docker з Compose.
 
 ```bash
-npm install
-cp .env.example .env          # заповни значення: див. docs/technical.md, розділ 5.2
-npx prisma migrate dev
+npm install                   # заодно генерує Prisma-клієнт
+npm run db:up                 # PostgreSQL у контейнері на localhost:5432 (значення в .env.development)
+cat > .env.local <<EOF2
+AUTH_SECRET=$(openssl rand -base64 32)
+SUPER_ADMIN_EMAIL=твоя@пошта
+EOF2
+npm run db:migrate            # створює таблиці
 npm run db:seed               # ролі й три демо-пісні
 npm run dev                   # http://localhost:3000
 ```
 
-Без налаштованого SMTP код для входу друкується в консоль, де запущено `npm run dev`. Вкажи свою пошту в `SUPER_ADMIN_EMAIL`, увійди нею, і ти отримаєш права адміна й супер-адміна.
+Продакшен-змінні описані в `.env.example`; локальній розробці вони не потрібні.
+
+Без налаштованого SMTP код для входу друкується в консоль, де запущено `npm run dev`. Увійди поштою з `SUPER_ADMIN_EMAIL`, і ти отримаєш права адміна й супер-адміна.
 
 Перевірки перед пул-реквестом: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
