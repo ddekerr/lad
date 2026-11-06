@@ -145,6 +145,14 @@ npm run dev              # http://localhost:3000
 | `npm run db:reset`          | стерти локальну базу, накотити міграції й seed             |
 | `npm run db:migrate:deploy` | міграції у віддаленому середовищі (без `.env.development`) |
 
+### 5.3.1 Перевірки в GitHub і захист main
+
+- `.github/workflows/ci.yml`: на кожен пуш у будь-яку гілку завдання `check` (Node 22): `npm ci`, `prisma generate`, `prettier --check .`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` (з фіктивними значеннями середовища). Результат прикріплюється до коміту й видно в пул-реквесті.
+- `.github/workflows/auto-pr.yml`: після пушу в гілку (не `main`) відкриває пул-реквест у `main`, якщо його ще немає. Потрібен дозвіл Settings → Actions → General → Workflow permissions: «Read and write» і «Allow GitHub Actions to create and approve pull requests».
+- Захист гілки `main` (Settings → Branches): обов'язковий пул-реквест, обов'язкова перевірка `check`, заборонені прямі пуші, force-push і видалення; правила діють і на адміна репозиторію.
+- `.githooks/`: `pre-commit` (не комітити в main), `pre-merge-commit` (не зливати в main локально), `pre-push` (не пушити в main). Підключаються скриптом `scripts/setup-hooks.mjs` (`prepare` у `npm install`, команда `git config core.hooksPath .githooks`). Це швидка підказка: справжній захист тримається на GitHub.
+- `npm run check` запускає локально те саме, що CI (без збірки).
+
 ### 5.4 Продакшен
 
 1. Задай змінні з розділу 5.2: у продакшені обов'язкові `AUTH_SECRET` (без нього застосунок падає), SMTP, `APP_URL`.

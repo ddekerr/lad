@@ -58,7 +58,11 @@ export type RoleRef = {
 };
 
 export type Denial =
-  'not_admin' | 'member_is_automatic' | 'member_not_removable' | 'admin_super_only' | 'super_admin_locked';
+  | 'not_admin'
+  | 'member_is_automatic'
+  | 'member_not_removable'
+  | 'admin_super_only'
+  | 'super_admin_locked';
 
 export type Decision = { ok: true } | { ok: false; reason: Denial };
 

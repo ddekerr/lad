@@ -1,0 +1,34 @@
+name: Auto pull request
+
+# Коли в гілку (не main) щось запушено, а пул-реквесту ще немає, створює його.
+# Потрібен дозвіл: Settings → Actions → General → «Allow GitHub Actions to create and approve pull requests».
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create pull request if missing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          existing=$(gh pr list --head "$BRANCH" --state open --json number --jq 'length')
+          if [ "$existing" != "0" ]; then
+            echo "Pull request for $BRANCH already exists"
+            exit 0
+          fi
+          title=$(git log -1 --format=%s)
+          gh pr create --base main --head "$BRANCH" --title "$title" \
+            --body "Створено автоматично після пушу. Злиття в main можливе, коли перевірка \`check\` (формат, ESLint, типи, тести, збірка) зелена."
