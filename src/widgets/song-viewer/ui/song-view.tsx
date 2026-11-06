@@ -7,7 +7,6 @@ import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
 import { IconMinus, IconPlus } from '@/shared/ui';
 
 type Props = {
-  id: string;
   body: string;
   originalKey: string;
   t: Dictionary;
@@ -17,7 +16,7 @@ type Props = {
  * Перегляд пісні: режими відображення й зміна тональності. Усе лише в браузері,
  * база не змінюється (гість теж може).
  */
-export function SongView({ id, body, originalKey, t }: Props) {
+export function SongView({ body, originalKey, t }: Props) {
   const [mode, setMode] = useState<DisplayMode>('both');
   const [shift, setShift] = useState(0);
 

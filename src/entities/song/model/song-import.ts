@@ -28,7 +28,7 @@ export function parseSongsJson(text: string): ImportDocumentResult {
   let document: unknown;
   try {
     // Блокнот Windows додає на початок файлу BOM: JSON.parse його не приймає
-    document = JSON.parse(text.replace(/^﻿/, ''));
+    document = JSON.parse(text.replace(/^\uFEFF/, ''));
   } catch {
     return { ok: false, error: 'invalid_json' };
   }
