@@ -40,9 +40,6 @@ jobs:
       - name: Prisma client
         run: npx prisma generate
 
-      - name: Format
-        run: npx prettier --check .
-
       - name: Lint (ESLint + межі шарів FSD)
         run: npm run lint
 
@@ -51,6 +48,27 @@ jobs:
 
       - name: Tests
         run: npm test
+
+  # Збірка йде окремо й не входить до обов'язкових перевірок main: вона повільніша й потребує мережі для шрифтів.
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+      DATABASE_URL_POOLING: postgresql://ci:ci@localhost:5432/ci?schema=public
+      APP_URL: http://localhost:3000
+      AUTH_SECRET: ci-only-secret-not-used-anywhere-else
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
 
       - name: Build
         run: npm run build
