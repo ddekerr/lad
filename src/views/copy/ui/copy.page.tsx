@@ -24,7 +24,7 @@ export default async function CopyPage({ params }: Props) {
 
   return (
     <CopyView
-      key={`${copy.id}:${copy.state}:${copy.title}:${copy.body.length}`}
+      key={`${copy.id}:${copyState(copy)}:${copy.title}:${copy.body.length}`}
       copy={{
         id: copy.id,
         title: copy.title,
