@@ -27,7 +27,7 @@ npm run db:seed               # ролі й три демо-пісні
 npm run dev                   # http://localhost:3000
 ```
 
-Стерти локальну базу: `npm run db:reset` або видалити `prisma/dev.db`. Продакшен-змінні описані в `.env.example`; локальній розробці вони не потрібні.
+Стерти локальну базу: видалити файл `prisma/dev.db` і знову виконати `npm run db:migrate` та `npm run db:seed`. Продакшен-змінні описані в `.env.example`; локальній розробці вони не потрібні.
 
 Без налаштованого SMTP код для входу друкується в консоль, де запущено `npm run dev`. Увійди поштою з `SUPER_ADMIN_EMAIL`, і ти отримаєш права адміна й супер-адміна.
 
@@ -40,7 +40,7 @@ npm run dev                   # http://localhost:3000
 3. Коли `check` зелена, зливай пул-реквест кнопкою на GitHub. Поки вона червона чи ще йде, злиття заблоковано.
 4. Локальний `main` лише оновлюй: `git switch main && git pull --ff-only`.
 
-Те саме локально перед пушем: `npm run check` (і `npm run build`); форматування: `npm run format`. Git-хуки з `.githooks` підключаються самі в `npm install`.
+Те саме локально перед пушем: `npm run check` (і `npm run build`); форматування: `npm run format`.
 
 ## Статус
 

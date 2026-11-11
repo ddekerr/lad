@@ -1,7 +1,0 @@
-#!/bin/sh
-# Заборона локального злиття в main: зливаємо лише через пул-реквест на GitHub.
-branch=$(git symbolic-ref --short -q HEAD)
-if [ "$branch" = "main" ]; then
-  echo "Не можна зливати в main локально. Відкрий пул-реквест і злий його на GitHub після зеленої перевірки." >&2
-  exit 1
-fi

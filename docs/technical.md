@@ -100,10 +100,10 @@ npm run dev              # http://localhost:3000
 
 **Як влаштовані налаштування розробки.**
 
-- База це один файл SQLite: `prisma/dev.db` (`DATABASE_URL=file:./dev.db`, шлях рахується від папки `prisma/`, де лежить `schema.prisma`). Файли `prisma/*.db*` у git не потрапляють. Стерти базу: `npm run db:reset` або видалити файл.
+- База це один файл SQLite: `prisma/dev.db` (`DATABASE_URL=file:./dev.db`, шлях рахується від папки `prisma/`, де лежить `schema.prisma`). Файли `prisma/*.db*` у git не потрапляють. Стерти базу: видалити файл і знову виконати `db:migrate` та `db:seed`.
 - `.env.development` (у репозиторії, без секретів): `DATABASE_URL`, `APP_URL`. Next.js читає його у `next dev` сам.
 - `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env.development`. Шаблон усіх змінних у `.env.example`.
-- `scripts/with-env.mjs`: Prisma CLI читає лише `.env`, тому команди `db:migrate`, `db:seed`, `db:studio`, `db:reset` запускаються через цей скрипт, який підтягує `.env.local` і `.env.development`. Змінні, вже задані в оточенні, він не чіпає, тож у CI чи на сервері береться їхнє значення.
+- `scripts/with-env.mjs`: Prisma CLI читає лише `.env`, тому команди `db:migrate`, `db:seed` запускаються через цей скрипт, який підтягує `.env.local` і `.env.development`. Змінні, вже задані в оточенні, він не чіпає, тож у CI чи на сервері береться їхнє значення.
 - `.env` лишається для віддаленого середовища; у розробці його значення перекриваються файлами вище.
 
 **Особливості SQLite.**
@@ -142,10 +142,7 @@ npm run dev              # http://localhost:3000
 | `npm test`                  | юніт-тести (`tsx --test "src/**/*.test.ts"`)               |
 | `npm run format`            | Prettier по всьому репозиторію                             |
 | `npm run db:migrate`        | `prisma migrate dev`                                       |
-| `npm run db:generate`       | генерація клієнта Prisma                                   |
 | `npm run db:seed`           | початкові дані                                             |
-| `npm run db:studio`         | Prisma Studio (перегляд БД)                                |
-| `npm run db:reset`          | стерти локальну базу, накотити міграції й seed             |
 | `npm run db:migrate:deploy` | міграції у віддаленому середовищі (без `.env.development`) |
 
 ### 5.3.1 Перевірки в GitHub і захист main
@@ -153,7 +150,6 @@ npm run dev              # http://localhost:3000
 - `.github/workflows/ci.yml`: на кожен пуш у будь-яку гілку завдання `check` (Node 22): `npm ci`, `prisma generate`, перевірка, що міграції відповідають схемі (`prisma migrate diff --exit-code`), `npm run lint`, `npm run typecheck`, `npm test`, і окреме `build` з `npm run build` (з фіктивними значеннями середовища; обов'язковою для `main` є лише `check`). Результат прикріплюється до коміту й видно в пул-реквесті.
 - `.github/workflows/auto-pr.yml`: після пушу в гілку (не `main`) відкриває пул-реквест у `main`, якщо його ще немає. Потрібен дозвіл Settings → Actions → General → Workflow permissions: «Read and write» і «Allow GitHub Actions to create and approve pull requests».
 - Захист гілки `main` (Settings → Branches): обов'язковий пул-реквест, обов'язкова перевірка `check`, заборонені прямі пуші, force-push і видалення; правила діють і на адміна репозиторію.
-- `.githooks/`: `pre-commit` (не комітити в main), `pre-merge-commit` (не зливати в main локально), `pre-push` (не пушити в main). Підключаються скриптом `scripts/setup-hooks.mjs` (`prepare` у `npm install`, команда `git config core.hooksPath .githooks`). Це швидка підказка: справжній захист тримається на GitHub.
 - `npm run check` запускає локально те саме, що `check` в CI. Форматування не входить до перевірок: Prettier різних версій форматує трохи по-різному, тож `npm run format` запускайте локально й комітьте результат.
 
 ### 5.4 Продакшен
