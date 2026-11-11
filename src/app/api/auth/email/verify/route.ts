@@ -16,13 +16,16 @@ export async function POST(request: Request) {
     email?: unknown;
     code?: unknown;
   } | null;
+
   const email = normalizeEmail(body?.email);
   const code = normalizeCode(body?.code);
+  
   if (!email || !code) {
     return NextResponse.json({ error: 'invalid_code' }, { status: 400 });
   }
 
   const result = await verifyLoginCode(email, code);
+  
   if (result !== 'ok') {
     const error = result === 'invalid' ? 'invalid_code' : result;
     return NextResponse.json({ error }, { status: STATUS[result] });

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /** Перегляд пісні: публічний, змінює лише відображення в браузері. */
-export default async function SongPage({ params }: Props) {
+export async function SongPage({ params }: Props) {
   const { id } = await params;
   const [song, { locale, t }, user] = await Promise.all([findSong(id), getDictionary(), getCurrentUser()]);
   if (!song) notFound();

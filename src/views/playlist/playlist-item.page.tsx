@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: 'Лад · Playlist' };
 
 type Props = { params: Promise<{ id: string }> };
 
-export default async function PlaylistPage({ params }: Props) {
+export async function PlaylistItemPage({ params }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect('/sign-in');
 

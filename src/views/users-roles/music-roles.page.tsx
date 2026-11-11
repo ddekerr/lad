@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Довідник музичних ролей. Лише супер-адмін. */
-export default async function MusicRolesPage() {
+export async function MusicRolesPage() {
   const [user, { locale, t }] = await Promise.all([getCurrentUser(), getDictionary()]);
   if (!user) redirect('/sign-in');
   if (!can(user.actor, 'musicRoles:manage')) return <Forbidden t={t} />;

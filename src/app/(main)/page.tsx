@@ -1,3 +1,1 @@
-export { CatalogPage as default, generateCatalogMetadata as generateMetadata } from '@/views/catalog';
-
-export const dynamic = 'force-dynamic';
+export { CatalogPage as default, generateMetadata } from '@/views/catalog/catalog.page';

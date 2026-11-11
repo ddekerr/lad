@@ -1,3 +1,1 @@
-export { StagePage as default, stageMetadata as metadata } from '@/views/stage';
-
-export const dynamic = 'force-dynamic';
+export { default, metadata } from '@/views/stage/stage.page';

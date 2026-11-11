@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: 'Лад · Playlists' };
 type Props = { searchParams: Promise<{ role?: string }> };
 
 /** Мої плейлисти в контексті однієї музичної ролі (або «без ролі»). */
-export default async function PlaylistsPage({ searchParams }: Props) {
+export async function PlaylistsPage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect('/sign-in');
 

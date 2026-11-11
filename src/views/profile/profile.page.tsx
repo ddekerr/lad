@@ -10,8 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Профіль: email, ролі (лише перегляд), мова, вихід. */
-export default async function ProfilePage() {
+export async function ProfilePage() {
   const [user, { locale, t }] = await Promise.all([getCurrentUser(), getDictionary()]);
+  
   if (!user) redirect('/sign-in');
 
   const roles = await prisma.role.findMany({

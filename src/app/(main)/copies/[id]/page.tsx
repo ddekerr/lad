@@ -1,3 +1,1 @@
-export { CopyPage as default, copyMetadata as metadata } from '@/views/copy';
-
-export const dynamic = 'force-dynamic';
+export { CopyPage as default, metadata } from '@/views/copy/copy.page';

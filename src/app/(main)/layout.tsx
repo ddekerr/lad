@@ -13,18 +13,21 @@ import { Logo } from '@/shared/ui';
  * користувач ще «Профіль», адмін «Користувачі», супер-адмін «Музичні ролі».
  */
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const [{ locale, t }, user] = await Promise.all([getDictionary(), getCurrentUser()]);
-
+  const { locale, t } = await getDictionary();
+  const user = await getCurrentUser();
   const items: NavItem[] = [{ href: '/', label: t.nav.songs, icon: 'music' }];
+
   if (!user) {
     items.push({ href: '/sign-in', label: t.nav.signIn, icon: 'user' });
   } else {
     items.push({ href: '/playlists', label: t.nav.playlists, icon: 'list' });
     items.push({ href: '/setlists', label: t.nav.setlists, icon: 'setlist' });
     items.push({ href: '/profile', label: t.nav.profile, icon: 'user' });
+    
     if (can(user.actor, 'users:read')) {
       items.push({ href: '/admin/users', label: t.nav.users, icon: 'users' });
     }
+    
     if (can(user.actor, 'musicRoles:manage')) {
       items.push({ href: '/admin/roles', label: t.nav.musicRoles, icon: 'tags' });
     }
