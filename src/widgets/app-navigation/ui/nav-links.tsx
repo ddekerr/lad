@@ -2,15 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { IconList, IconMusic, IconTags, IconUser, IconUsers } from '@/shared/ui';
+import { IconList, IconMusic, IconSetlist, IconTags, IconUser, IconUsers } from '@/shared/ui';
 
 export type NavItem = {
   href: string;
   label: string;
-  icon: 'music' | 'list' | 'user' | 'users' | 'tags';
+  icon: 'music' | 'list' | 'setlist' | 'user' | 'users' | 'tags';
 };
 
-const ICONS = { music: IconMusic, list: IconList, user: IconUser, users: IconUsers, tags: IconTags };
+const ICONS = {
+  music: IconMusic,
+  list: IconList,
+  setlist: IconSetlist,
+  user: IconUser,
+  users: IconUsers,
+  tags: IconTags,
+};
 
 function isActive(pathname: string, href: string): boolean {
   if (href === '/') return pathname === '/' || pathname.startsWith('/songs');

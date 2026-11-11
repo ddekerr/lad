@@ -3,11 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  /// З'єднання застосунку (може йти через пулер)
-  url       = env("DATABASE_URL_POOLING")
-  /// Пряме з'єднання для міграцій (через пулер вони зависають). Локально збігається з DATABASE_URL_POOLING.
-  directUrl = env("DATABASE_URL")
+  provider = "sqlite"
+  /// Файл бази: у розробці file:./dev.db (відносно папки prisma/), на сервері абсолютний шлях на постійному диску
+  url      = env("DATABASE_URL")
 }
 
 enum RoleKind {
@@ -25,6 +23,12 @@ enum Language {
   uk
 }
 
+enum PartDifficulty {
+  easy
+  medium
+  hard
+}
+
 model User {
   id          String    @id @default(cuid())
   email       String    @unique
@@ -38,6 +42,9 @@ model User {
   roles         UserRole[]     @relation("RoleOwner")
   grantedRoles  UserRole[]     @relation("RoleGrantedBy")
   playlists     Playlist[]
+  generations   PartGeneration[]
+  setlists      Setlist[]
+  stageSessions StageSession[]
   createdSongs  Song[]         @relation("SongCreatedBy")
   updatedSongs  Song[]         @relation("SongUpdatedBy")
 
@@ -122,7 +129,9 @@ model Song {
   language    Language
   originalKey String
   /// Текст з акордами у стилі ChordPro: [Am]Слова [G]тут
-  body        String    @db.Text
+  body        String
+  /// Назва й виконавець малими літерами: SQLite не ігнорує регістр кирилиці в LIKE, тож пошук і сортування йдуть по цьому полю
+  searchKey   String    @default("")
   /// Зростає при кожній зміні вмісту; копії порівнюють її зі своєю synced_version
   version     Int       @default(1)
   createdById String?
@@ -135,9 +144,11 @@ model Song {
   createdBy User?      @relation("SongCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy User?      @relation("SongUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   copies    SongCopy[]
+  setlistItems SetlistItem[]
 
   @@index([title])
   @@index([artist])
+  @@index([searchKey])
   @@index([deletedAt])
   @@map("songs")
 }
@@ -169,19 +180,112 @@ model SongCopy {
   artist        String
   language      Language
   originalKey   String
-  body          String   @db.Text
+  body          String  
   /// Зсув тональності в півтонах; відображення = body + зсув
   keyShift      Int      @default(0)
-  notes         String   @default("") @db.Text
+  notes         String   @default("")
   syncedVersion Int?
   isStandalone  Boolean  @default(false)
+  /// Параметри для генерації партій (задає власник копії): темп, розмір, динаміка розділів
+  bpm             Int?
+  timeSignature   String?
+  /// {"<id розділу>": 1..5}; id розділу це підпис або тип мітки без регістру
+  sectionDynamics Json     @default("{}")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
-  sourceSong Song?    @relation(fields: [sourceSongId], references: [id], onDelete: SetNull)
+  playlist   Playlist   @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  sourceSong Song?      @relation(fields: [sourceSongId], references: [id], onDelete: SetNull)
+  parts      CopyPart[]
 
   @@index([playlistId, position])
   @@index([sourceSongId])
   @@map("song_copies")
+}
+
+/// Партія для інструмента, згенерована ШІ для копії пісні. Одна на інструмент і рівень складності.
+model CopyPart {
+  id            String         @id @default(cuid())
+  copyId        String
+  /// Поки лише "bass"
+  instrument    String
+  difficulty    PartDifficulty
+  /// Хеш входу генерації (такти, акорди, темп, розмір, динаміка, версія запиту); інший хеш означає, що партія застаріла
+  inputHash     String
+  /// Модель, що написала партію
+  model         String
+  promptVersion Int
+  /// {"bars": [{"bar": 1, "chords": ["Am"], "notes": [{"beat": 1, "length": 4, "pitch": "A1"}]}]}
+  data          Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  copy SongCopy @relation(fields: [copyId], references: [id], onDelete: Cascade)
+
+  @@unique([copyId, instrument, difficulty])
+  @@map("copy_parts")
+}
+
+/// Журнал генерацій для добового ліміту на користувача
+model PartGeneration {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("part_generations")
+}
+
+/// Спільний список пісень на виступ: бачать і змінюють усі авторизовані
+model Setlist {
+  id          String   @id @default(cuid())
+  name        String
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  items     SetlistItem[]
+  sessions  StageSession[]
+
+  @@map("setlists")
+}
+
+model SetlistItem {
+  id         String @id @default(cuid())
+  setlistId  String
+  songId     String
+  position   Int
+  /// Тональність виступу: зсув від оригіналу в півтонах, 0..11
+  keyShift   Int    @default(0)
+
+  setlist Setlist @relation(fields: [setlistId], references: [id], onDelete: Cascade)
+  song    Song    @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@index([setlistId, position])
+  @@map("setlist_items")
+}
+
+/// Спільна сцена. Рядок завжди один (id = 'main'), тому одночасно вона запущена лише в однієї людини.
+model StageSession {
+  id          String   @id
+  setlistId   String
+  startedById String
+  /// Номер пісні в сетлісті, з нуля
+  itemIndex   Int      @default(0)
+  /// Номер такту в пісні, з нуля
+  bar         Int      @default(0)
+  /// Поточна тональність (зсув 0..11); ведучий може змінити її відносно сетліста
+  keyShift    Int      @default(0)
+  /// Зростає при кожній зміні: учасники питають лише про новіше
+  revision    Int      @default(1)
+  startedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  setlist   Setlist @relation(fields: [setlistId], references: [id], onDelete: Cascade)
+  startedBy User    @relation(fields: [startedById], references: [id], onDelete: Cascade)
+
+  @@map("stage_sessions")
 }

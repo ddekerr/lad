@@ -20,3 +20,11 @@ export async function requireEditor(): Promise<MemberResult> {
   if (!can(user.actor, 'song:write')) return { response: forbidden() };
   return { user };
 }
+
+/** Для сетлістів і спільної сцени: потрібен авторизований користувач (дія setlist:manage). */
+export async function requireSetlistUser(): Promise<MemberResult> {
+  const user = await getCurrentUser();
+  if (!user) return { response: unauthorized() };
+  if (!can(user.actor, 'setlist:manage')) return { response: forbidden() };
+  return { user };
+}

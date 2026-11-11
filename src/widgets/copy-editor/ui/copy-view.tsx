@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { SongBody, type DisplayMode } from '@/entities/song';
-import type { CopyState } from '@/entities/song-copy';
+import { BodyField, SongBody, type DisplayMode } from '@/entities/song';
+import type { CopyState, PartView, SectionDynamics } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
-import { IconChevronLeft, IconExpand, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
+import { IconChevronLeft, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
+import { CopyParameters } from './copy-parameters';
+import { CopyParts } from './copy-parts';
 
 type Props = {
   copy: {
@@ -19,9 +21,14 @@ type Props = {
     body: string;
     keyShift: number;
     notes: string;
+    bpm: number | null;
+    timeSignature: string | null;
+    sectionDynamics: SectionDynamics;
     state: CopyState;
   };
   playlist: { id: string; name: string };
+  parts: PartView[];
+  canGenerate: boolean;
   t: Dictionary;
 };
 
@@ -33,7 +40,7 @@ const secondary = 'min-h-11 rounded-tile bg-line px-5 font-semibold text-cream h
  * Моя копія: тональність і нотатки зберігаються в самій копії, правки тексту живуть
  * лише в ній. Одна кнопка «Оновити згідно з оригіналом» замінює назву, текст і акорди.
  */
-export function CopyView({ copy, playlist, t }: Props) {
+export function CopyView({ copy, playlist, parts, canGenerate, t }: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<DisplayMode>('both');
   const [shift, setShift] = useState(copy.keyShift);
@@ -191,21 +198,24 @@ export function CopyView({ copy, playlist, t }: Props) {
                   className="min-h-11 rounded-tile bg-ink px-4"
                 />
               </label>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm text-muted">{t.copy.editBody}</span>
-                <textarea
-                  value={draft.body}
-                  onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-                  rows={16}
-                  spellCheck={false}
-                  className="rounded-tile bg-ink p-4 font-mono text-sm"
-                />
-                <span className="text-xs text-muted">{t.copy.editHint}</span>
-              </label>
+              <BodyField
+                label={t.copy.editBody}
+                hint={t.copy.editHint}
+                value={draft.body}
+                onChange={(body) => setDraft({ ...draft, body })}
+                rows={16}
+                t={t}
+              />
               <div>
                 <div className="mb-2 text-sm text-muted">{t.copy.preview}</div>
                 <div className="rounded-tile bg-ink p-4">
-                  <SongBody body={draft.body} mode="both" shift={shift} preferFlats={preferFlats} />
+                  <SongBody
+                    body={draft.body}
+                    mode="both"
+                    shift={shift}
+                    preferFlats={preferFlats}
+                    sectionNames={t.sections.names}
+                  />
                 </div>
               </div>
               <div className="flex gap-3">
@@ -225,7 +235,13 @@ export function CopyView({ copy, playlist, t }: Props) {
               </div>
             </form>
           ) : (
-            <SongBody body={copy.body} mode={mode} shift={shift} preferFlats={preferFlats} />
+            <SongBody
+              body={copy.body}
+              mode={mode}
+              shift={shift}
+              preferFlats={preferFlats}
+              sectionNames={t.sections.names}
+            />
           )}
         </section>
 
@@ -310,14 +326,6 @@ export function CopyView({ copy, playlist, t }: Props) {
             </button>
           )}
 
-          <Link
-            href={`/copies/${copy.id}/stage`}
-            className="flex min-h-11 items-center justify-center gap-2 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
-          >
-            <IconExpand size={18} />
-            {t.song.stageMode}
-          </Link>
-
           {confirmDelete ? (
             <div className="flex flex-col gap-3">
               <p className="text-sm">{t.copy.deleteCopyConfirm}</p>
@@ -345,6 +353,22 @@ export function CopyView({ copy, playlist, t }: Props) {
           )}
         </aside>
       </div>
+
+      <CopyParameters
+        copyId={copy.id}
+        body={copy.body}
+        initial={{ bpm: copy.bpm, timeSignature: copy.timeSignature, sectionDynamics: copy.sectionDynamics }}
+        t={t}
+      />
+
+      <CopyParts
+        copyId={copy.id}
+        originalKey={copy.originalKey}
+        shift={shift}
+        parts={parts}
+        canGenerate={canGenerate}
+        t={t}
+      />
     </main>
   );
 }

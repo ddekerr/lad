@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { copyState, parseCopyPatch } from '@/entities/song-copy';
+import { copyState, parseCopyPatch, readDynamics } from '@/entities/song-copy';
 import { requireMember } from '@/server/auth/api';
 import { badRequest, notFound } from '@/server/auth/guard';
 import { prisma } from '@/server/db';
@@ -29,12 +29,15 @@ export async function GET(_request: Request, { params }: Context) {
       body: copy.body,
       keyShift: copy.keyShift,
       notes: copy.notes,
+      bpm: copy.bpm,
+      timeSignature: copy.timeSignature,
+      sectionDynamics: readDynamics(copy.sectionDynamics),
       state: copyState(copy),
     },
   });
 }
 
-/** PATCH /api/copies/{id}: змінити назву, виконавця, текст з акордами, нотатки, зсув тональності. */
+/** PATCH /api/copies/{id}: змінити назву, виконавця, текст з акордами, нотатки, зсув тональності, параметри партій. */
 export async function PATCH(request: Request, { params }: Context) {
   const auth = await requireMember();
   if ('response' in auth) return auth.response;

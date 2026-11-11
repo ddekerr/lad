@@ -4,5 +4,11 @@ out
 next-env.d.ts
 *.tsbuildinfo
 .env
-.env.local
+.env*.local
 .DS_Store
+
+# Локальна база SQLite
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db-shm
+prisma/*.db-wal

@@ -70,7 +70,7 @@ export async function SongPage({ params }: Props) {
 
       <AddToPlaylist songId={song.id} playlists={playlists} t={t} />
 
-      <SongView id={song.id} body={song.body} originalKey={song.originalKey} t={t} />
+      <SongView body={song.body} originalKey={song.originalKey} t={t} />
     </main>
   );
 }

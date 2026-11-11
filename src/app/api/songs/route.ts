@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { parseSongInput } from '@/entities/song';
+import { parseSongInput, songSearchKey } from '@/entities/song';
 import { requireEditor } from '@/server/auth/api';
 import { badRequest } from '@/server/auth/guard';
 import { prisma } from '@/server/db';
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   const songs = await prisma.song.findMany({
     where: catalogWhere(q),
-    orderBy: { title: 'asc' },
+    orderBy: { searchKey: 'asc' },
     select: { id: true, title: true, artist: true, language: true, originalKey: true },
   });
 
@@ -29,7 +29,12 @@ export async function POST(request: Request) {
   if (!parsed.ok) return badRequest(parsed.error);
 
   const song = await prisma.song.create({
-    data: { ...parsed.data, createdById: auth.user.id, updatedById: auth.user.id },
+    data: {
+      ...parsed.data,
+      searchKey: songSearchKey(parsed.data),
+      createdById: auth.user.id,
+      updatedById: auth.user.id,
+    },
     select: { id: true },
   });
   return NextResponse.json({ song }, { status: 201 });

@@ -1,14 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { SongBody, type DisplayMode } from '@/entities/song';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
-import { IconExpand, IconMinus, IconPlus } from '@/shared/ui';
+import { IconMinus, IconPlus } from '@/shared/ui';
 
 type Props = {
-  id: string;
   body: string;
   originalKey: string;
   t: Dictionary;
@@ -18,7 +16,7 @@ type Props = {
  * Перегляд пісні: режими відображення й зміна тональності. Усе лише в браузері,
  * база не змінюється (гість теж може).
  */
-export function SongView({ id, body, originalKey, t }: Props) {
+export function SongView({ body, originalKey, t }: Props) {
   const [mode, setMode] = useState<DisplayMode>('both');
   const [shift, setShift] = useState(0);
 
@@ -38,7 +36,7 @@ export function SongView({ id, body, originalKey, t }: Props) {
         aria-label={t.song.display}
         className="min-w-0 flex-1 overflow-x-auto rounded-card bg-surface p-5 sm:p-8"
       >
-        <SongBody body={body} mode={mode} shift={shift} preferFlats={preferFlats} />
+        <SongBody body={body} mode={mode} shift={shift} preferFlats={preferFlats} sectionNames={t.sections.names} />
       </section>
 
       <aside className="flex flex-col gap-6 rounded-card bg-surface p-5 lg:sticky lg:top-6 lg:w-80 lg:flex-none">
@@ -96,14 +94,6 @@ export function SongView({ id, body, originalKey, t }: Props) {
           )}
           <p className="text-sm text-muted">{t.song.keyHint}</p>
         </div>
-
-        <Link
-          href={`/songs/${id}/stage?shift=${shift}`}
-          className="flex min-h-11 items-center justify-center gap-2 rounded-tile bg-amber px-5 font-semibold text-ink hover:bg-amber-active"
-        >
-          <IconExpand size={18} />
-          {t.song.stageMode}
-        </Link>
       </aside>
     </div>
   );

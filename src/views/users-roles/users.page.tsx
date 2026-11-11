@@ -25,7 +25,7 @@ export async function UsersPage({ searchParams }: Props) {
   const [allRoles, rows] = await Promise.all([
     prisma.role.findMany({ orderBy: [{ kind: 'asc' }, { key: 'asc' }] }),
     prisma.user.findMany({
-      where: query ? { email: { contains: query, mode: 'insensitive' } } : {},
+      where: query ? { email: { contains: query } } : {},
       orderBy: { email: 'asc' },
       take: 100,
       select: { id: true, email: true, roles: { select: { roleId: true } } },

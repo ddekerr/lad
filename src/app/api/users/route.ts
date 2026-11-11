@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   const search = new URL(request.url).searchParams.get('search')?.trim() ?? '';
   const users = await prisma.user.findMany({
-    where: search ? { email: { contains: search, mode: 'insensitive' } } : {},
+    where: search ? { email: { contains: search } } : {},
     orderBy: { email: 'asc' },
     take: 100,
     select: {

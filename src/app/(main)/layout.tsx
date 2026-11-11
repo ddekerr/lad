@@ -21,6 +21,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
     items.push({ href: '/sign-in', label: t.nav.signIn, icon: 'user' });
   } else {
     items.push({ href: '/playlists', label: t.nav.playlists, icon: 'list' });
+    items.push({ href: '/setlists', label: t.nav.setlists, icon: 'setlist' });
     items.push({ href: '/profile', label: t.nav.profile, icon: 'user' });
     
     if (can(user.actor, 'users:read')) {

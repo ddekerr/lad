@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { parseSongInput, SongBody } from '@/entities/song';
+import { BodyField, parseSongInput, SongBody } from '@/entities/song';
 import { fmt, type Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats } from '@/shared/lib/chords';
 
@@ -95,24 +95,26 @@ export function SongEditor({ songId, initial, t }: Props) {
             </label>
           </div>
           <p className="-mt-2 text-xs text-muted">{t.editor.keyHint}</p>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm text-muted">{t.editor.fieldBody}</span>
-            <textarea
-              value={form.body}
-              onChange={(e) => set('body', e.target.value)}
-              rows={18}
-              spellCheck={false}
-              className="rounded-tile bg-ink p-4 font-mono text-sm"
-            />
-            <span className="text-xs text-muted">{t.editor.bodyHint}</span>
-          </label>
+          <BodyField
+            label={t.editor.fieldBody}
+            hint={t.editor.bodyHint}
+            value={form.body}
+            onChange={(body) => set('body', body)}
+            t={t}
+          />
           {songId && <p className="text-xs text-muted">{t.editor.versionHint}</p>}
         </div>
 
         <section aria-label={t.editor.preview} className="flex flex-col gap-3">
           <div className="text-sm text-muted">{t.editor.preview}</div>
           <div className="min-h-40 overflow-x-auto rounded-card bg-surface p-5 sm:p-8">
-            <SongBody body={form.body} mode="both" shift={0} preferFlats={shouldPreferFlats(form.originalKey, 0)} />
+            <SongBody
+              body={form.body}
+              mode="both"
+              shift={0}
+              preferFlats={shouldPreferFlats(form.originalKey, 0)}
+              sectionNames={t.sections.names}
+            />
           </div>
         </section>
 
