@@ -21,8 +21,7 @@ jobs:
     timeout-minutes: 15
     env:
       # Фіктивні значення: збірці й перевіркам реальна база не потрібна
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
-      DATABASE_URL_POOLING: postgresql://ci:ci@localhost:5432/ci?schema=public
+      DATABASE_URL: file:./ci.db
       APP_URL: http://localhost:3000
       AUTH_SECRET: ci-only-secret-not-used-anywhere-else
       NEXT_TELEMETRY_DISABLED: '1'
@@ -40,6 +39,14 @@ jobs:
       - name: Prisma client
         run: npx prisma generate
 
+      - name: Міграції відповідають схемі
+        run: >
+          npx prisma migrate diff
+          --from-migrations prisma/migrations
+          --to-schema-datamodel prisma/schema.prisma
+          --shadow-database-url file:./shadow.db
+          --exit-code
+
       - name: Lint (ESLint + межі шарів FSD)
         run: npm run lint
 
@@ -55,8 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
-      DATABASE_URL_POOLING: postgresql://ci:ci@localhost:5432/ci?schema=public
+      DATABASE_URL: file:./ci.db
       APP_URL: http://localhost:3000
       AUTH_SECRET: ci-only-secret-not-used-anywhere-else
       NEXT_TELEMETRY_DISABLED: '1'

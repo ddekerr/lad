@@ -15,7 +15,7 @@
 | Фреймворк      | Next.js 15 (App Router, Turbopack у dev), React 19                                                          |
 | Мова           | TypeScript (strict)                                                                                         |
 | Стилі          | Tailwind CSS 4 (токени в `@theme` у `src/app/globals.css`), шрифти через `next/font/google`                 |
-| База даних     | PostgreSQL, ORM Prisma 6                                                                                    |
+| База даних     | SQLite (файл), ORM Prisma 6                                                                                 |
 | Пошта          | nodemailer 7 (SMTP)                                                                                         |
 | Автентифікація | власна: Google OAuth 2.0 і одноразовий код на email; сесія в httpOnly cookie                                |
 | Тести          | вбудований `node:test`, запуск через `tsx`                                                                  |
@@ -86,26 +86,31 @@
 
 ### 5.1 Підготовка
 
-Потрібні Node.js 22 (на Windows запускайте з WSL саме Linux-версію Node, не Windows-ову) і Docker з Compose.
+Потрібен Node.js 22 (на Windows запускайте з WSL саме Linux-версію Node, не Windows-ову). Окрема база не потрібна.
 
 ```bash
 git clone https://github.com/ddekerr/lad.git
 cd lad
 npm install              # postinstall генерує Prisma-клієнт
-npm run db:up            # PostgreSQL 16 у Docker, localhost:5432
 # створи .env.local з AUTH_SECRET і SUPER_ADMIN_EMAIL (див. нижче)
-npm run db:migrate       # створює таблиці
+npm run db:migrate       # створює файл prisma/dev.db і таблиці
 npm run db:seed          # ролі (Member, Editor, Admin, басист, співак, піаніст) і три демо-пісні
 npm run dev              # http://localhost:3000
 ```
 
 **Як влаштовані налаштування розробки.**
 
-- `docker-compose.yml`: сервіс `db` (образ `postgres:16-alpine`, контейнер `lad-db`, том `lad-pgdata`, порт лише на `127.0.0.1`, перевірка готовності). Дані переживають `db:down`; повністю стерти базу можна командою `docker compose --env-file .env.development down -v`.
-- `.env.development` (у репозиторії, без секретів): логін, пароль і порт контейнера, `DATABASE_URL`, `DATABASE_URL_POOLING`, `APP_URL`. Next.js читає його у `next dev` сам.
+- База це один файл SQLite: `prisma/dev.db` (`DATABASE_URL=file:./dev.db`, шлях рахується від папки `prisma/`, де лежить `schema.prisma`). Файли `prisma/*.db*` у git не потрапляють. Стерти базу: `npm run db:reset` або видалити файл.
+- `.env.development` (у репозиторії, без секретів): `DATABASE_URL`, `APP_URL`. Next.js читає його у `next dev` сам.
 - `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env.development`. Шаблон усіх змінних у `.env.example`.
 - `scripts/with-env.mjs`: Prisma CLI читає лише `.env`, тому команди `db:migrate`, `db:seed`, `db:studio`, `db:reset` запускаються через цей скрипт, який підтягує `.env.local` і `.env.development`. Змінні, вже задані в оточенні, він не чіпає, тож у CI чи на сервері береться їхнє значення.
 - `.env` лишається для віддаленого середовища; у розробці його значення перекриваються файлами вище.
+
+**Особливості SQLite.**
+
+- Один провайдер для розробки й продакшена, одна історія міграцій (`prisma/migrations`).
+- Пошук і сортування без урахування регістру: `LIKE` у SQLite розрізняє регістр у кирилиці, тому в `songs.searchKey` зберігається назва й виконавець малими літерами (`songSearchKey`, `normalizeSearch` у `entities/song`), а каталог шукає й сортує по ньому. Пошук користувачів за email працює через `LIKE` (ASCII).
+- Пише в базу один процес за раз: для цього застосунку цього досить, але масштабувати на кілька серверів із одним файлом не можна.
 
 Перший вхід у розробці: якщо `SMTP_HOST` порожній, код входу друкується в консоль, де запущено `npm run dev` (рядок `[mail:dev] Login code for …`). Вкажи свою пошту в `SUPER_ADMIN_EMAIL` (`.env.local`), увійди нею, і ти отримаєш права адміна й супер-адміна. Роль Editor видає адмін на сторінці «Користувачі».
 
@@ -115,8 +120,7 @@ npm run dev              # http://localhost:3000
 
 | Змінна                                                                             | Обов'язкова    | Призначення                                                                                                |
 | ---------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL_POOLING`                                                             | так            | з'єднання застосунку (`url` у `schema.prisma`); може йти через пулер, локально збігається з `DATABASE_URL` |
-| `DATABASE_URL`                                                                     | так            | пряме з'єднання для міграцій (`directUrl` у `schema.prisma`)                                               |
+| `DATABASE_URL`                                                                     | так            | файл SQLite: `file:./dev.db` у розробці, абсолютний шлях на постійному диску на сервері                    |
 | `APP_URL`                                                                          | у продакшені   | публічна адреса (для редіректів Google); за замовчуванням `http://localhost:3000`                          |
 | `AUTH_SECRET`                                                                      | у продакшені   | секрет для хешування кодів входу, не менше 16 символів; `openssl rand -base64 32`                          |
 | `SUPER_ADMIN_EMAIL`                                                                | рекомендується | email супер-адміна (можна кілька через кому)                                                               |
@@ -141,13 +145,12 @@ npm run dev              # http://localhost:3000
 | `npm run db:generate`       | генерація клієнта Prisma                                   |
 | `npm run db:seed`           | початкові дані                                             |
 | `npm run db:studio`         | Prisma Studio (перегляд БД)                                |
-| `npm run db:up` / `db:down` | запустити / зупинити локальну базу в Docker                |
 | `npm run db:reset`          | стерти локальну базу, накотити міграції й seed             |
 | `npm run db:migrate:deploy` | міграції у віддаленому середовищі (без `.env.development`) |
 
 ### 5.3.1 Перевірки в GitHub і захист main
 
-- `.github/workflows/ci.yml`: на кожен пуш у будь-яку гілку завдання `check` (Node 22): `npm ci`, `prisma generate`, `npm run lint`, `npm run typecheck`, `npm test`, і окреме `build` з `npm run build` (з фіктивними значеннями середовища; обов'язковою для `main` є лише `check`). Результат прикріплюється до коміту й видно в пул-реквесті.
+- `.github/workflows/ci.yml`: на кожен пуш у будь-яку гілку завдання `check` (Node 22): `npm ci`, `prisma generate`, перевірка, що міграції відповідають схемі (`prisma migrate diff --exit-code`), `npm run lint`, `npm run typecheck`, `npm test`, і окреме `build` з `npm run build` (з фіктивними значеннями середовища; обов'язковою для `main` є лише `check`). Результат прикріплюється до коміту й видно в пул-реквесті.
 - `.github/workflows/auto-pr.yml`: після пушу в гілку (не `main`) відкриває пул-реквест у `main`, якщо його ще немає. Потрібен дозвіл Settings → Actions → General → Workflow permissions: «Read and write» і «Allow GitHub Actions to create and approve pull requests».
 - Захист гілки `main` (Settings → Branches): обов'язковий пул-реквест, обов'язкова перевірка `check`, заборонені прямі пуші, force-push і видалення; правила діють і на адміна репозиторію.
 - `.githooks/`: `pre-commit` (не комітити в main), `pre-merge-commit` (не зливати в main локально), `pre-push` (не пушити в main). Підключаються скриптом `scripts/setup-hooks.mjs` (`prepare` у `npm install`, команда `git config core.hooksPath .githooks`). Це швидка підказка: справжній захист тримається на GitHub.
@@ -156,9 +159,10 @@ npm run dev              # http://localhost:3000
 ### 5.4 Продакшен
 
 1. Задай змінні з розділу 5.2: у продакшені обов'язкові `AUTH_SECRET` (без нього застосунок падає), SMTP, `APP_URL`.
-2. `npm run db:migrate:deploy` (застосувати міграції), одноразово `npm run db:seed`.
-3. `npm run build`, потім `npm start`.
-4. Cookie сесії в продакшені має прапорець `secure`, тож потрібен HTTPS.
+2. Файл бази має лежати на постійному диску (VPS, Fly.io чи Railway з томом), не на тимчасовій файловій системі (Vercel, Netlify): вкажіть абсолютний шлях у `DATABASE_URL`. Резервна копія це копія файлу (або `sqlite3 lad.db ".backup копія.db"`).
+3. `npm run db:migrate:deploy` (застосувати міграції), одноразово `npm run db:seed`.
+4. `npm run build`, потім `npm start`.
+5. Cookie сесії в продакшені має прапорець `secure`, тож потрібен HTTPS.
 
 ## 6. Автентифікація і права
 

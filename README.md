@@ -14,21 +14,20 @@
 
 ## Швидкий старт
 
-Потрібні Node.js 22 (Linux-версія, у WSL не Windows-ова) і Docker з Compose.
+Потрібен Node.js 22 (Linux-версія, у WSL не Windows-ова). Окрема база не потрібна: дані лежать у файлі SQLite всередині проєкту.
 
 ```bash
 npm install                   # заодно генерує Prisma-клієнт
-npm run db:up                 # PostgreSQL у контейнері на localhost:5432 (значення в .env.development)
 cat > .env.local <<EOF2
 AUTH_SECRET=$(openssl rand -base64 32)
 SUPER_ADMIN_EMAIL=твоя@пошта
 EOF2
-npm run db:migrate            # створює таблиці
+npm run db:migrate            # створює файл бази prisma/dev.db і таблиці
 npm run db:seed               # ролі й три демо-пісні
 npm run dev                   # http://localhost:3000
 ```
 
-Продакшен-змінні описані в `.env.example`; локальній розробці вони не потрібні.
+Стерти локальну базу: `npm run db:reset` або видалити `prisma/dev.db`. Продакшен-змінні описані в `.env.example`; локальній розробці вони не потрібні.
 
 Без налаштованого SMTP код для входу друкується в консоль, де запущено `npm run dev`. Увійди поштою з `SUPER_ADMIN_EMAIL`, і ти отримаєш права адміна й супер-адміна.
 

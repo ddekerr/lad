@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { contentChanged, parseSongInput } from '@/entities/song';
+import { contentChanged, parseSongInput, songSearchKey } from '@/entities/song';
 import { requireEditor } from '@/server/auth/api';
 import { badRequest, notFound } from '@/server/auth/guard';
 import { prisma } from '@/server/db';
@@ -47,7 +47,12 @@ export async function PATCH(request: Request, { params }: Context) {
   }
   const song = await prisma.song.update({
     where: { id },
-    data: { ...parsed.data, version: { increment: 1 }, updatedById: auth.user.id },
+    data: {
+      ...parsed.data,
+      searchKey: songSearchKey(parsed.data),
+      version: { increment: 1 },
+      updatedById: auth.user.id,
+    },
     select: { id: true, version: true },
   });
   return NextResponse.json({ song });

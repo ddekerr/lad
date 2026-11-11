@@ -23,7 +23,7 @@ export async function CatalogPage({ searchParams }: Props) {
 
   const songs = await prisma.song.findMany({
     where: catalogWhere(query),
-    orderBy: { title: 'asc' },
+    orderBy: { searchKey: 'asc' },
     select: { id: true, title: true, artist: true, originalKey: true, language: true },
   });
 

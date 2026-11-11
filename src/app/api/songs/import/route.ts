@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { MAX_IMPORT_BYTES, parseSongsJson, validateImportedSongs } from '@/entities/song';
+import { MAX_IMPORT_BYTES, parseSongsJson, songSearchKey, validateImportedSongs } from '@/entities/song';
 import { requireEditor } from '@/server/auth/api';
 import { badRequest } from '@/server/auth/guard';
 import { prisma } from '@/server/db';
@@ -36,7 +36,12 @@ export async function POST(request: Request) {
 
   // Один INSERT: усі пісні зберігаються разом або не зберігається жодна
   await prisma.song.createMany({
-    data: result.songs.map((song) => ({ ...song, createdById: auth.user.id, updatedById: auth.user.id })),
+    data: result.songs.map((song) => ({
+      ...song,
+      searchKey: songSearchKey(song),
+      createdById: auth.user.id,
+      updatedById: auth.user.id,
+    })),
   });
 
   return NextResponse.json({ imported: result.songs.length, ignoredFields: result.ignoredFields }, { status: 201 });

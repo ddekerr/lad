@@ -3,11 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  /// З'єднання застосунку (може йти через пулер)
-  url       = env("DATABASE_URL_POOLING")
-  /// Пряме з'єднання для міграцій (через пулер вони зависають). Локально збігається з DATABASE_URL_POOLING.
-  directUrl = env("DATABASE_URL")
+  provider = "sqlite"
+  /// Файл бази: у розробці file:./dev.db (відносно папки prisma/), на сервері абсолютний шлях на постійному диску
+  url      = env("DATABASE_URL")
 }
 
 enum RoleKind {
@@ -131,7 +129,7 @@ model Song {
   language    Language
   originalKey String
   /// Текст з акордами у стилі ChordPro: [Am]Слова [G]тут
-  body        String    @db.Text
+  body        String   
   /// Зростає при кожній зміні вмісту; копії порівнюють її зі своєю synced_version
   version     Int       @default(1)
   createdById String?
@@ -148,6 +146,7 @@ model Song {
 
   @@index([title])
   @@index([artist])
+  @@index([searchKey])
   @@index([deletedAt])
   @@map("songs")
 }
@@ -179,10 +178,10 @@ model SongCopy {
   artist        String
   language      Language
   originalKey   String
-  body          String   @db.Text
+  body          String  
   /// Зсув тональності в півтонах; відображення = body + зсув
   keyShift      Int      @default(0)
-  notes         String   @default("") @db.Text
+  notes         String   @default("")
   syncedVersion Int?
   isStandalone  Boolean  @default(false)
   /// Параметри для генерації партій (задає власник копії): темп, розмір, динаміка розділів

@@ -59,7 +59,10 @@ async function main() {
 
   const existing = await prisma.song.count();
   if (existing === 0) {
-    await prisma.song.createMany({ data: SONGS.map((s) => ({ ...s })) });
+    // Те саме правило, що songSearchKey в src/entities/song/model/song-search.ts
+    const searchKey = (s: { title: string; artist: string }) =>
+      `${s.title} ${s.artist}`.trim().replace(/\s+/g, ' ').toLowerCase();
+    await prisma.song.createMany({ data: SONGS.map((s) => ({ ...s, searchKey: searchKey(s) })) });
   }
 
   console.log(`Seed done: ${ROLES.length} roles, songs in DB: ${await prisma.song.count()}`);
