@@ -78,7 +78,7 @@
 │   └── server/
 ├── eslint.config.mjs          правила лінтера й архітектурних меж
 ├── .prettierrc                singleQuote, semi, printWidth 120
-├── .env.example               шаблон змінних середовища
+├── .env.example               шаблон змінних середовища (продакшен)
 └── package.json
 ```
 
@@ -101,10 +101,9 @@ npm run dev              # http://localhost:3000
 **Як влаштовані налаштування розробки.**
 
 - База це один файл SQLite: `prisma/dev.db` (`DATABASE_URL=file:./dev.db`, шлях рахується від папки `prisma/`, де лежить `schema.prisma`). Файли `prisma/*.db*` у git не потрапляють. Стерти базу: видалити файл і знову виконати `db:migrate` та `db:seed`.
-- `.env.development` (у репозиторії, без секретів): `DATABASE_URL`, `APP_URL`. Next.js читає його у `next dev` сам.
-- `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env.development`. Шаблон усіх змінних у `.env.example`.
-- Команди `db:migrate` і `db:seed` запускають Prisma CLI через `node --env-file=.env.development --env-file-if-exists=.env.local`: сам Prisma читає лише `.env`, тому файли розробки підтягує Node. `.env.local` перекриває `.env.development`, а змінні, вже задані в оточенні (CI, сервер), не змінюються.
-- `.env` лишається для віддаленого середовища; у розробці його значення перекриваються файлами вище.
+- `.env` (у репозиторії, без секретів): `DATABASE_URL`, `APP_URL`. Його читають і Next.js, і Prisma CLI, тому `prisma migrate dev` та `prisma db seed` працюють без обгорток.
+- `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env`. Шаблон усіх змінних у `.env.example`.
+- Змінні, задані в оточенні (CI, хостинг), мають пріоритет над файлами, тож на сервері значення з `.env` перекриваються налаштуваннями хостингу.
 
 **Особливості SQLite.**
 
@@ -116,7 +115,7 @@ npm run dev              # http://localhost:3000
 
 ### 5.2 Змінні середовища
 
-Шаблон: `.env.example`. Файл `.env` не комітиться.
+Шаблон: `.env.example`. Файл `.env.local` не комітиться.
 
 | Змінна                                                                             | Обов'язкова    | Призначення                                                                                                |
 | ---------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -143,7 +142,7 @@ npm run dev              # http://localhost:3000
 | `npm run format`            | Prettier по всьому репозиторію                             |
 | `npm run db:migrate`        | `prisma migrate dev`                                       |
 | `npm run db:seed`           | початкові дані                                             |
-| `npm run db:migrate:deploy` | міграції у віддаленому середовищі (без `.env.development`) |
+| `npm run db:migrate:deploy` | міграції у віддаленому середовищі  |
 
 ### 5.3.1 Перевірки в GitHub і захист main
 
