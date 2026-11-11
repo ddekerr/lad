@@ -18,10 +18,7 @@
 
 ```bash
 npm install                   # заодно генерує Prisma-клієнт
-cat > .env.local <<EOF2
-AUTH_SECRET=$(openssl rand -base64 32)
-SUPER_ADMIN_EMAIL=твоя@пошта
-EOF2
+cp .env.example .env          # впиши в .env свої AUTH_SECRET (openssl rand -base64 32) і SUPER_ADMIN_EMAIL
 npm run db:migrate            # створює файл бази prisma/dev.db і таблиці
 npm run db:seed               # ролі й три демо-пісні
 npm run dev                   # http://localhost:3000
