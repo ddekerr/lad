@@ -129,7 +129,9 @@ model Song {
   language    Language
   originalKey String
   /// Текст з акордами у стилі ChordPro: [Am]Слова [G]тут
-  body        String   
+  body        String
+  /// Назва й виконавець малими літерами: SQLite не ігнорує регістр кирилиці в LIKE, тож пошук і сортування йдуть по цьому полю
+  searchKey   String    @default("")
   /// Зростає при кожній зміні вмісту; копії порівнюють її зі своєю synced_version
   version     Int       @default(1)
   createdById String?
