@@ -103,7 +103,7 @@ npm run dev              # http://localhost:3000
 - База це один файл SQLite: `prisma/dev.db` (`DATABASE_URL=file:./dev.db`, шлях рахується від папки `prisma/`, де лежить `schema.prisma`). Файли `prisma/*.db*` у git не потрапляють. Стерти базу: видалити файл і знову виконати `db:migrate` та `db:seed`.
 - `.env.development` (у репозиторії, без секретів): `DATABASE_URL`, `APP_URL`. Next.js читає його у `next dev` сам.
 - `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env.development`. Шаблон усіх змінних у `.env.example`.
-- `scripts/with-env.mjs`: Prisma CLI читає лише `.env`, тому команди `db:migrate`, `db:seed` запускаються через цей скрипт, який підтягує `.env.local` і `.env.development`. Змінні, вже задані в оточенні, він не чіпає, тож у CI чи на сервері береться їхнє значення.
+- Команди `db:migrate` і `db:seed` запускають Prisma CLI через `node --env-file=.env.development --env-file-if-exists=.env.local`: сам Prisma читає лише `.env`, тому файли розробки підтягує Node. `.env.local` перекриває `.env.development`, а змінні, вже задані в оточенні (CI, сервер), не змінюються.
 - `.env` лишається для віддаленого середовища; у розробці його значення перекриваються файлами вище.
 
 **Особливості SQLite.**
