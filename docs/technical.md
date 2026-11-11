@@ -78,7 +78,7 @@
 │   └── server/
 ├── eslint.config.mjs          правила лінтера й архітектурних меж
 ├── .prettierrc                singleQuote, semi, printWidth 120
-├── .env.example               шаблон змінних середовища
+├── .env.example               шаблон змінних середовища (продакшен)
 └── package.json
 ```
 
@@ -92,7 +92,7 @@
 git clone https://github.com/ddekerr/lad.git
 cd lad
 npm install              # postinstall генерує Prisma-клієнт
-# створи .env.local з AUTH_SECRET і SUPER_ADMIN_EMAIL (див. нижче)
+cp .env.example .env     # впиши в .env свої AUTH_SECRET і SUPER_ADMIN_EMAIL (див. нижче)
 npm run db:migrate       # створює файл prisma/dev.db і таблиці
 npm run db:seed          # ролі (Member, Editor, Admin, басист, співак, піаніст) і три демо-пісні
 npm run dev              # http://localhost:3000
@@ -101,10 +101,8 @@ npm run dev              # http://localhost:3000
 **Як влаштовані налаштування розробки.**
 
 - База це один файл SQLite: `prisma/dev.db` (`DATABASE_URL=file:./dev.db`, шлях рахується від папки `prisma/`, де лежить `schema.prisma`). Файли `prisma/*.db*` у git не потрапляють. Стерти базу: видалити файл і знову виконати `db:migrate` та `db:seed`.
-- `.env.development` (у репозиторії, без секретів): `DATABASE_URL`, `APP_URL`. Next.js читає його у `next dev` сам.
-- `.env.local` (не комітиться): `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Перекриває `.env.development`. Шаблон усіх змінних у `.env.example`.
-- `scripts/with-env.mjs`: Prisma CLI читає лише `.env`, тому команди `db:migrate`, `db:seed` запускаються через цей скрипт, який підтягує `.env.local` і `.env.development`. Змінні, вже задані в оточенні, він не чіпає, тож у CI чи на сервері береться їхнє значення.
-- `.env` лишається для віддаленого середовища; у розробці його значення перекриваються файлами вище.
+- `.env` (не комітиться, створюється копією `.env.example`): усі змінні середовища, зокрема `DATABASE_URL=file:./dev.db`, `APP_URL`, `AUTH_SECRET`, `SUPER_ADMIN_EMAIL` і за бажання ключі Google, SMTP, Anthropic. Його читають і Next.js, і Prisma CLI, тому `prisma migrate dev` та `prisma db seed` працюють без обгорток.
+- Змінні, задані в оточенні (CI, хостинг), мають пріоритет над `.env`, тож на сервері достатньо налаштувань хостингу.
 
 **Особливості SQLite.**
 
@@ -112,7 +110,7 @@ npm run dev              # http://localhost:3000
 - Пошук і сортування без урахування регістру: `LIKE` у SQLite розрізняє регістр у кирилиці, тому в `songs.searchKey` зберігається назва й виконавець малими літерами (`songSearchKey`, `normalizeSearch` у `entities/song`), а каталог шукає й сортує по ньому. Пошук користувачів за email працює через `LIKE` (ASCII).
 - Пише в базу один процес за раз: для цього застосунку цього досить, але масштабувати на кілька серверів із одним файлом не можна.
 
-Перший вхід у розробці: якщо `SMTP_HOST` порожній, код входу друкується в консоль, де запущено `npm run dev` (рядок `[mail:dev] Login code for …`). Вкажи свою пошту в `SUPER_ADMIN_EMAIL` (`.env.local`), увійди нею, і ти отримаєш права адміна й супер-адміна. Роль Editor видає адмін на сторінці «Користувачі».
+Перший вхід у розробці: якщо `SMTP_HOST` порожній, код входу друкується в консоль, де запущено `npm run dev` (рядок `[mail:dev] Login code for …`). Вкажи свою пошту в `SUPER_ADMIN_EMAIL` (`.env`), увійди нею, і ти отримаєш права адміна й супер-адміна. Роль Editor видає адмін на сторінці «Користувачі».
 
 ### 5.2 Змінні середовища
 
@@ -143,7 +141,7 @@ npm run dev              # http://localhost:3000
 | `npm run format`            | Prettier по всьому репозиторію                             |
 | `npm run db:migrate`        | `prisma migrate dev`                                       |
 | `npm run db:seed`           | початкові дані                                             |
-| `npm run db:migrate:deploy` | міграції у віддаленому середовищі (без `.env.development`) |
+| `npm run db:migrate:deploy` | міграції у віддаленому середовищі  |
 
 ### 5.3.1 Перевірки в GitHub і захист main
 

@@ -14,9 +14,9 @@
     "format:check": "prettier --check .",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "postinstall": "prisma generate",
-    "db:migrate": "node scripts/with-env.mjs prisma migrate dev",
+    "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:seed": "node scripts/with-env.mjs prisma db seed"
+    "db:seed": "prisma db seed"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
