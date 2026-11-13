@@ -99,6 +99,8 @@ export function toCopyView(copy: CopyRow) {
   };
 }
 
+export type CopyViewData = ReturnType<typeof toCopyView>;
+
 /** Позиція для нової копії в кінці плейлиста (позиції з нуля). */
 export function nextPosition(positions: readonly number[]): number {
   return positions.length === 0 ? 0 : Math.max(...positions) + 1;
