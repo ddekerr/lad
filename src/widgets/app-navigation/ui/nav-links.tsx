@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IconList, IconMusic, IconSetlist, IconTags, IconUser, IconUsers } from '@/shared/ui';
+import { isActive } from '../model/is-active';
 
 export type NavItem = {
   href: string;
@@ -18,12 +19,6 @@ const ICONS = {
   users: IconUsers,
   tags: IconTags,
 };
-
-function isActive(pathname: string, href: string): boolean {
-  if (href === '/') return pathname === '/' || pathname.startsWith('/songs');
-  if (href === '/playlists') return pathname.startsWith('/playlists') || pathname.startsWith('/copies');
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 /** Навігація: вузька бічна панель із іконками (комп'ютер) або нижня панель (телефон). */
 export function NavLinks({ items, variant }: { items: NavItem[]; variant: 'side' | 'bottom' }) {
