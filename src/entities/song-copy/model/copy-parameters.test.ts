@@ -177,3 +177,29 @@ describe('withDynamicsLevel', () => {
     assert.deepEqual(withDynamicsLevel({ a: 2 }, 'a', '5'), { a: 5 });
   });
 });
+
+describe('межі динаміки', () => {
+  const entries = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`s${i}`, 3]));
+
+  it('parseDynamics: рівно 50 розділів ще можна, 51 вже ні', () => {
+    assert.notEqual(parseDynamics(entries(50)), null);
+    assert.equal(parseDynamics(entries(51)), null);
+  });
+
+  it('parseDynamics: довжина id від 1 до 60 символів', () => {
+    assert.deepEqual(parseDynamics({ a: 3 }), { a: 3 });
+    assert.equal(parseDynamics({ '': 3 }), null);
+    assert.notEqual(parseDynamics({ ['x'.repeat(60)]: 3 }), null);
+    assert.equal(parseDynamics({ ['x'.repeat(61)]: 3 }), null);
+  });
+
+  it('parseDynamics: рівні 1 і 5 приймаються, 0 і 6 ні', () => {
+    assert.deepEqual(parseDynamics({ a: 1, b: 5 }), { a: 1, b: 5 });
+    assert.equal(parseDynamics({ a: 0 }), null);
+    assert.equal(parseDynamics({ a: 6 }), null);
+  });
+
+  it('readDynamics: крайні рівні лишаються, поза межами відкидаються', () => {
+    assert.deepEqual(readDynamics({ a: 1, b: 5, c: 0, d: 6 }), { a: 1, b: 5 });
+  });
+});

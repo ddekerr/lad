@@ -169,3 +169,16 @@ describe('toCopyView (що віддаємо про копію)', () => {
     assert.equal(toCopyView({ ...row, isStandalone: true }).state, 'standalone');
   });
 });
+
+describe('moveItem: межі', () => {
+  it('перший вниз і останній вгору рухаються, за край ні', () => {
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'a', 1), ['b', 'a', 'c']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'c', -1), ['a', 'c', 'b']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'a', -1), ['a', 'b', 'c']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'c', 1), ['a', 'b', 'c']);
+  });
+
+  it('елемента немає в списку: без змін', () => {
+    assert.deepEqual(moveItem(['a', 'b'], 'z', 1), ['a', 'b']);
+  });
+});
