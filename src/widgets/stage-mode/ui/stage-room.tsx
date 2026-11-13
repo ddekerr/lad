@@ -4,10 +4,14 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SongBody, type DisplayMode } from '@/entities/song';
 import {
+  applyCommand,
   barOfLine,
   clampBar,
+  commandResult,
   lineOfBar,
   matchPartBar,
+  nextStage,
+  parseStagePrefs,
   stepSection,
   type StageCommand,
   type StageItemView,
@@ -81,14 +85,15 @@ export function StageRoom({ meId, items, initial, partsBySong, t }: Props) {
   // Свої налаштування (вигляд, рівень, розмір) пам'ятаємо на цьому пристрої; без сховища все працює й так.
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(PREFS_KEY) ?? 'null') as {
-        view?: View;
-        level?: PartDifficulty;
-        size?: number;
-      } | null;
-      if (saved?.view && VIEWS.some((v) => v.value === saved.view)) setView(saved.view);
-      if (saved?.level) setLevel(saved.level);
-      if (typeof saved?.size === 'number') setSize(Math.max(MIN_SIZE, Math.min(MAX_SIZE, saved.size)));
+      const saved = parseStagePrefs(
+        localStorage.getItem(PREFS_KEY),
+        VIEWS.map((v) => v.value),
+        MIN_SIZE,
+        MAX_SIZE,
+      );
+      if (saved.view) setView(saved.view as View);
+      if (saved.level) setLevel(saved.level as PartDifficulty);
+      if (saved.size !== undefined) setSize(saved.size);
     } catch {
       // сховище недоступне: лишаємо значення за замовчуванням
     }
@@ -115,13 +120,14 @@ export function StageRoom({ meId, items, initial, partsBySong, t }: Props) {
         const data = (await res.json()) as { changed?: boolean; stage?: StageStateView | null };
         if (stopped) return;
         setOffline(false);
-        if (data.stage === null) {
+        const outcome = nextStage(data, revision.current);
+        if (outcome.kind === 'ended') {
           setEnded(true);
           return;
         }
-        if (data.stage && data.stage.revision >= revision.current) {
-          revision.current = data.stage.revision;
-          setStage(data.stage);
+        if (outcome.kind === 'update') {
+          revision.current = outcome.stage.revision;
+          setStage(outcome.stage);
         }
       } catch {
         if (!stopped) setOffline(true);
@@ -170,26 +176,21 @@ export function StageRoom({ meId, items, initial, partsBySong, t }: Props) {
     async (command: StageCommand) => {
       if (!isLeader) return;
       // Одразу показуємо своє: сервер підтвердить і віддасть остаточний стан.
-      setStage((current) => {
-        if (command.type === 'item') {
-          return { ...current, item: command.item, bar: 0, keyShift: items[command.item]?.keyShift ?? 0 };
-        }
-        if (command.type === 'bar') return { ...current, bar: command.bar };
-        return { ...current, keyShift: command.shift };
-      });
+      setStage((current) => applyCommand(current, command, items));
       const res = await fetch('/api/stage', {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(command),
       }).catch(() => null);
       const data = (await res?.json().catch(() => null)) as { stage?: StageStateView } | null;
-      if (res?.ok && data?.stage) {
-        revision.current = data.stage.revision;
-        setStage(data.stage);
+      const outcome = commandResult(res?.ok ?? false, res?.status, data);
+      if (outcome.kind === 'confirmed') {
+        revision.current = outcome.stage.revision;
+        setStage(outcome.stage);
       } else {
         // не вдалося: наступне опитування поверне справжній стан
         revision.current = 0;
-        if (res?.status === 404) setEnded(true);
+        if (outcome.kind === 'ended') setEnded(true);
       }
     },
     [isLeader, items],
