@@ -8,15 +8,11 @@ type Failed = Extract<BuildInputResult, { ok: false }>;
 describe('generationRejection (тіло відповіді 400)', () => {
   it('бракує параметрів: що саме бракує й не більше 20 проблем із тактами', () => {
     const issues = Array.from({ length: 25 }, (_, i) => ({ bar: i + 1, line: 1, code: 'uneven' as const, chords: 1, beats: 3 }));
-    const failed = {
-      ok: false,
-      reason: 'missing_parameters',
-      missing: { bpm: true, timeSignature: false, sections: [], complete: false },
-      barIssues: issues,
-    } as unknown as Failed;
+    const missing = { bpm: true, timeSignature: false, sections: [], complete: false };
+    const failed = { ok: false, reason: 'missing_parameters', missing, barIssues: issues } as unknown as Failed;
     const body = generationRejection(failed);
     assert.equal(body.error, 'missing_parameters');
-    assert.deepEqual(body.missing, failed.missing);
+    assert.deepEqual(body.missing, missing);
     assert.equal((body.barIssues as unknown[]).length, 20);
   });
 
