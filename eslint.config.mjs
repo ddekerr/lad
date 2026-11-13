@@ -4,7 +4,7 @@ import tseslint from 'typescript-eslint';
 import checkFile from 'eslint-plugin-check-file';
 
 export default [
-  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'prisma/**', '*.config.*', '.vscode/**', 'scripts/**'] },
+  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'prisma/**', '*.config.*', '.vscode/**', 'scripts/**', 'tools/**'] },
 
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
