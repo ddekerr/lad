@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { buildGenerationInput, MAX_PART_BARS, parseDifficulty } from '@/entities/song-copy';
+import { buildGenerationInput, generationRejection, parseDifficulty } from '@/entities/song-copy';
 import { requireMember } from '@/server/auth/api';
 import { badRequest, notFound } from '@/server/auth/guard';
 import { getOwnedCopy } from '@/server/playlists';
@@ -51,15 +51,7 @@ export async function POST(request: Request, { params }: Context) {
   if (!difficulty) return badRequest('invalid_difficulty');
 
   const built = buildGenerationInput(copyForParts(copy), difficulty);
-  if (!built.ok) {
-    if (built.reason === 'missing_parameters') {
-      return NextResponse.json(
-        { error: 'missing_parameters', missing: built.missing, barIssues: built.barIssues.slice(0, 20) },
-        { status: 400 },
-      );
-    }
-    return NextResponse.json({ error: built.reason, max: MAX_PART_BARS }, { status: 400 });
-  }
+  if (!built.ok) return NextResponse.json(generationRejection(built), { status: 400 });
 
   const apiKey = anthropicApiKey();
   if (!apiKey) return NextResponse.json({ error: 'ai_not_configured' }, { status: 503 });

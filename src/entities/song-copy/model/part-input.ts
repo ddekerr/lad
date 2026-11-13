@@ -50,6 +50,21 @@ type CopyForParts = {
 };
 
 /** Збирає вхід для генерації або каже, чого бракує. Партія робиться в тональності, яку музикант грає (оригінал + зсув). */
+/** Скільки проблем із тактами повертаємо у відповіді. */
+const MAX_REPORTED_BAR_ISSUES = 20;
+
+/** Тіло відповіді 400, коли з копії не вдалося зібрати вхід для генерації. */
+export function generationRejection(failed: Extract<BuildInputResult, { ok: false }>): Record<string, unknown> {
+  if (failed.reason === 'missing_parameters') {
+    return {
+      error: failed.reason,
+      missing: failed.missing,
+      barIssues: failed.barIssues.slice(0, MAX_REPORTED_BAR_ISSUES),
+    };
+  }
+  return { error: failed.reason, max: MAX_PART_BARS };
+}
+
 export function buildGenerationInput(copy: CopyForParts, difficulty: PartDifficulty): BuildInputResult {
   const missing = missingParameters(copy);
   const { bars } = parseBars(copy.body);
