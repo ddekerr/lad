@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { parseCopyPatch } from './copy-input';
-import { missingParameters, parseBpm, parseDynamics, parseTimeSignature, readDynamics } from './copy-parameters';
+import {
+  bpmFromInput,
+  missingParameters,
+  parseBpm,
+  parseDynamics,
+  parseTimeSignature,
+  readDynamics,
+  withDynamicsLevel,
+} from './copy-parameters';
 
 describe('parseBpm', () => {
   it('приймає цілі в межах', () => {
@@ -131,5 +139,41 @@ describe('parseCopyPatch: параметри партій', () => {
 
   it('невідомі поля ігноруються, а порожній запит це помилка', () => {
     assert.deepEqual(parseCopyPatch({ other: 1 }), { ok: false, error: 'empty_patch' });
+  });
+});
+
+describe('bpmFromInput (поле темпу у формі)', () => {
+  it('порожнє поле це «не задано», і це допустимо', () => {
+    assert.deepEqual(bpmFromInput(''), { value: null, valid: true });
+    assert.deepEqual(bpmFromInput('   '), { value: null, valid: true });
+  });
+
+  it('ціле в межах приймається', () => {
+    assert.deepEqual(bpmFromInput('120'), { value: 120, valid: true });
+    assert.deepEqual(bpmFromInput('30'), { value: 30, valid: true });
+    assert.deepEqual(bpmFromInput('300'), { value: 300, valid: true });
+  });
+
+  it('поза межами, дробове й не число недопустимі', () => {
+    assert.equal(bpmFromInput('29').valid, false);
+    assert.equal(bpmFromInput('301').valid, false);
+    assert.equal(bpmFromInput('90.5').valid, false);
+    assert.equal(bpmFromInput('abc').valid, false);
+  });
+});
+
+describe('withDynamicsLevel', () => {
+  it('ставить рівень, не змінюючи вихідний об\'єкт', () => {
+    const before = { a: 2 };
+    assert.deepEqual(withDynamicsLevel(before, 'b', '4'), { a: 2, b: 4 });
+    assert.deepEqual(before, { a: 2 });
+  });
+
+  it('порожнє значення знімає рівень розділу', () => {
+    assert.deepEqual(withDynamicsLevel({ a: 2, b: 3 }, 'a', ''), { b: 3 });
+  });
+
+  it('замінює наявний рівень', () => {
+    assert.deepEqual(withDynamicsLevel({ a: 2 }, 'a', '5'), { a: 5 });
   });
 });

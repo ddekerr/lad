@@ -21,6 +21,19 @@ export function parseBpm(value: unknown): number | null {
   return typeof value === 'number' && Number.isInteger(value) && value >= MIN_BPM && value <= MAX_BPM ? value : null;
 }
 
+/** Поле темпу з форми: порожнє означає «не задано», решта має бути цілим у межах. */
+export function bpmFromInput(text: string): { value: number | null; valid: boolean } {
+  if (text.trim() === '') return { value: null, valid: true };
+  const value = parseBpm(Number(text));
+  return { value, valid: value !== null };
+}
+
+/** Нова динаміка з одним зміненим розділом; порожнє значення знімає рівень. */
+export function withDynamicsLevel(current: SectionDynamics, id: string, value: string): SectionDynamics {
+  const rest = Object.fromEntries(Object.entries(current).filter(([key]) => key !== id));
+  return value === '' ? rest : { ...rest, [id]: Number(value) };
+}
+
 export function parseTimeSignature(value: unknown): TimeSignature | null {
   return typeof value === 'string' && (TIME_SIGNATURES as readonly string[]).includes(value)
     ? (value as TimeSignature)

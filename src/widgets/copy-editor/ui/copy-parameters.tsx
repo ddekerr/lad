@@ -3,12 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
+  bpmFromInput,
   MAX_BPM,
   MAX_DYNAMICS,
   MIN_BPM,
   MIN_DYNAMICS,
   missingParameters,
   TIME_SIGNATURES,
+  withDynamicsLevel,
   type SectionDynamics,
 } from '@/entities/song-copy';
 import { fmt, type Dictionary } from '@/shared/i18n';
@@ -37,12 +39,11 @@ export function CopyParameters({ copyId, body, initial, t }: Props) {
   const [status, setStatus] = useState<'idle' | 'saved' | 'error' | 'invalid_bpm'>('idle');
 
   const sections = listSections(body);
-  const bpmNumber = bpm.trim() === '' ? null : Number(bpm);
-  const bpmValid = bpmNumber === null || (Number.isInteger(bpmNumber) && bpmNumber >= MIN_BPM && bpmNumber <= MAX_BPM);
+  const { value: bpmNumber, valid: bpmValid } = bpmFromInput(bpm);
 
   const missing = missingParameters({
     body,
-    bpm: bpmValid ? bpmNumber : null,
+    bpm: bpmNumber,
     timeSignature: signature || null,
     sectionDynamics: dynamics,
   });
@@ -54,12 +55,7 @@ export function CopyParameters({ copyId, body, initial, t }: Props) {
   const nameById = new Map(sections.map((s) => [s.id, sectionName(s)]));
 
   function setLevel(id: string, value: string) {
-    setDynamics((current) => {
-      const next = { ...current };
-      if (value === '') delete next[id];
-      else next[id] = Number(value);
-      return next;
-    });
+    setDynamics((current) => withDynamicsLevel(current, id, value));
     setStatus('idle');
   }
 
