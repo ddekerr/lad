@@ -2,7 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useRef, useState, type ChangeEvent } from 'react';
-import { MAX_IMPORT_BYTES, MAX_IMPORT_SONGS, type ImportIssue, type ImportItemError } from '@/entities/song';
+import {
+  MAX_IMPORT_BYTES,
+  MAX_IMPORT_SONGS,
+  importOutcome,
+  type ImportIssue,
+  type ImportItemError,
+  type ImportResponse,
+} from '@/entities/song';
 import { fmt, type Dictionary } from '@/shared/i18n';
 import { IconClose } from '@/shared/ui';
 
@@ -11,14 +18,6 @@ type Status =
   | { kind: 'busy' }
   | { kind: 'done'; imported: number; ignoredFields: string[] }
   | { kind: 'failed'; message: string; items: ImportItemError[]; total: number };
-
-type ImportResponse = {
-  imported?: number;
-  ignoredFields?: string[];
-  error?: string;
-  items?: ImportItemError[];
-  total?: number;
-};
 
 function errorText(t: Dictionary, code: string): string {
   const errors: Record<string, string> = t.songImport.errors;
@@ -57,20 +56,15 @@ export function ImportSongs({ t }: { t: Dictionary }) {
       if (!res) return fail('generic');
 
       const data = (await res.json().catch(() => null)) as ImportResponse | null;
-      if (res.ok && typeof data?.imported === 'number') {
-        setStatus({ kind: 'done', imported: data.imported, ignoredFields: data.ignoredFields ?? [] });
+      const outcome = importOutcome(res.ok, data);
+      if (outcome.kind === 'done') {
+        setStatus(outcome);
         router.refresh();
-        return;
+      } else if (outcome.kind === 'invalid_songs') {
+        setStatus({ kind: 'failed', message: t.songImport.failedTitle, items: outcome.items, total: outcome.total });
+      } else {
+        fail(outcome.code);
       }
-      if (data?.error === 'invalid_songs') {
-        return setStatus({
-          kind: 'failed',
-          message: t.songImport.failedTitle,
-          items: data.items ?? [],
-          total: data.total ?? data.items?.length ?? 0,
-        });
-      }
-      fail(data?.error ?? 'generic');
     } catch {
       fail('generic');
     } finally {

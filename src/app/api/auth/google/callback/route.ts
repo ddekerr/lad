@@ -1,7 +1,7 @@
 import { cookies, headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { OAUTH_STATE_COOKIE, appUrl, googleConfig } from '@/server/auth/config';
-import { normalizeEmail } from '@/server/auth/crypto';
+import { callbackCode, verifiedGoogleProfile, type GoogleProfile } from '@/server/auth/google-callback';
 import { createSession, setSessionCookie } from '@/server/auth/session';
 import { findOrCreateUser } from '@/server/auth/users';
 import { LOCALE_COOKIE } from '@/shared/i18n';
@@ -15,16 +15,11 @@ export async function GET(request: Request) {
   const config = googleConfig();
   if (!config) return fail('google_not_configured');
 
-  const params = new URL(request.url).searchParams;
-  const code = params.get('code');
-  const state = params.get('state');
-
   const store = await cookies();
   const expectedState = store.get(OAUTH_STATE_COOKIE)?.value;
   store.delete(OAUTH_STATE_COOKIE);
-  if (!code || !state || !expectedState || state !== expectedState) {
-    return fail('google_failed');
-  }
+  const code = callbackCode(new URL(request.url).searchParams, expectedState);
+  if (!code) return fail('google_failed');
 
   try {
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -48,18 +43,10 @@ export async function GET(request: Request) {
       headers: { authorization: `Bearer ${accessToken}` },
     });
     if (!profileResponse.ok) return fail('google_failed');
-    const profile = (await profileResponse.json()) as {
-      sub?: string;
-      email?: string;
-      email_verified?: boolean;
-    };
+    const profile = verifiedGoogleProfile((await profileResponse.json()) as GoogleProfile);
+    if (!profile) return fail('google_failed');
 
-    const email = normalizeEmail(profile.email);
-    if (!profile.sub || !email || profile.email_verified !== true) {
-      return fail('google_failed');
-    }
-
-    const user = await findOrCreateUser(email, 'google', profile.sub);
+    const user = await findOrCreateUser(profile.email, 'google', profile.sub);
     const session = await createSession(user.id, (await headers()).get('user-agent'));
     await setSessionCookie(session.token, session.expiresAt);
     store.set(LOCALE_COOKIE, user.language, {

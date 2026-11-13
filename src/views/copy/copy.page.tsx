@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { CopyView } from '@/widgets/copy-editor';
-import { buildGenerationInput, copyState, readDynamics } from '@/entities/song-copy';
+import { buildGenerationInput, copyState, toCopyView } from '@/entities/song-copy';
 import { getCurrentUser } from '@/server/auth/session';
 import { getDictionary } from '@/server/i18n';
 import { copyForParts, listCopyParts } from '@/server/parts/service';
@@ -25,20 +25,7 @@ export async function CopyPage({ params }: Props) {
   return (
     <CopyView
       key={`${copy.id}:${copyState(copy)}:${copy.title}:${copy.body.length}`}
-      copy={{
-        id: copy.id,
-        title: copy.title,
-        artist: copy.artist,
-        language: copy.language,
-        originalKey: copy.originalKey,
-        body: copy.body,
-        keyShift: copy.keyShift,
-        notes: copy.notes,
-        bpm: copy.bpm,
-        timeSignature: copy.timeSignature,
-        sectionDynamics: readDynamics(copy.sectionDynamics),
-        state: copyState(copy),
-      }}
+      copy={toCopyView(copy)}
       playlist={{ id: copy.playlist.id, name: copy.playlist.name }}
       parts={parts}
       canGenerate={canGenerate}

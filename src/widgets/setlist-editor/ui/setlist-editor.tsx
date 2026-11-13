@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { moveSetlistItem, shiftItemKey } from '@/entities/setlist';
 import { fmt, type Dictionary } from '@/shared/i18n';
 import { transposeKey } from '@/shared/lib/chords';
 import { IconArrowDown, IconArrowUp, IconChevronLeft, IconClose, IconMinus, IconPlus, IconSearch } from '@/shared/ui';
@@ -66,17 +67,11 @@ export function SetlistEditor({ setlist, stage, t }: Props) {
   }
 
   const move = (index: number, delta: -1 | 1) => {
-    const target = index + delta;
-    if (target < 0 || target >= items.length) return;
-    const next = [...items];
-    [next[index], next[target]] = [next[target], next[index]];
-    change(next);
+    const next = moveSetlistItem(items, index, delta);
+    if (next) change(next);
   };
 
-  const shiftKey = (index: number, delta: number) =>
-    change(
-      items.map((item, i) => (i === index ? { ...item, keyShift: (((item.keyShift + delta) % 12) + 12) % 12 } : item)),
-    );
+  const shiftKey = (index: number, delta: number) => change(shiftItemKey(items, index, delta));
 
   const add = (song: FoundSong) =>
     change([

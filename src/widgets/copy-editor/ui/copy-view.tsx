@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { BodyField, SongBody, type DisplayMode } from '@/entities/song';
-import type { CopyState, PartView, SectionDynamics } from '@/entities/song-copy';
+import type { CopyViewData, PartView } from '@/entities/song-copy';
 import type { Dictionary } from '@/shared/i18n';
 import { shouldPreferFlats, transposeKey } from '@/shared/lib/chords';
 import { IconChevronLeft, IconMinus, IconPlus, IconWarning } from '@/shared/ui';
@@ -12,20 +12,7 @@ import { CopyParameters } from './copy-parameters';
 import { CopyParts } from './copy-parts';
 
 type Props = {
-  copy: {
-    id: string;
-    title: string;
-    artist: string;
-    language: 'en' | 'uk';
-    originalKey: string;
-    body: string;
-    keyShift: number;
-    notes: string;
-    bpm: number | null;
-    timeSignature: string | null;
-    sectionDynamics: SectionDynamics;
-    state: CopyState;
-  };
+  copy: CopyViewData;
   playlist: { id: string; name: string };
   parts: PartView[];
   canGenerate: boolean;

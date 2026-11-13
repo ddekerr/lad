@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { copyState, parseCopyPatch, readDynamics } from '@/entities/song-copy';
+import { parseCopyPatch, toCopyView } from '@/entities/song-copy';
 import { requireMember } from '@/server/auth/api';
 import { badRequest, notFound } from '@/server/auth/guard';
 import { prisma } from '@/server/db';
@@ -18,23 +18,7 @@ export async function GET(_request: Request, { params }: Context) {
   const copy = await getOwnedCopy(auth.user.id, id);
   if (!copy) return notFound('copy');
 
-  return NextResponse.json({
-    copy: {
-      id: copy.id,
-      playlistId: copy.playlistId,
-      title: copy.title,
-      artist: copy.artist,
-      language: copy.language,
-      originalKey: copy.originalKey,
-      body: copy.body,
-      keyShift: copy.keyShift,
-      notes: copy.notes,
-      bpm: copy.bpm,
-      timeSignature: copy.timeSignature,
-      sectionDynamics: readDynamics(copy.sectionDynamics),
-      state: copyState(copy),
-    },
-  });
+  return NextResponse.json({ copy: { ...toCopyView(copy), playlistId: copy.playlistId } });
 }
 
 /** PATCH /api/copies/{id}: змінити назву, виконавця, текст з акордами, нотатки, зсув тональності, параметри партій. */

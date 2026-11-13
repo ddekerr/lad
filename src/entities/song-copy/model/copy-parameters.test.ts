@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { parseCopyPatch } from './copy-input';
-import { missingParameters, parseBpm, parseDynamics, parseTimeSignature, readDynamics } from './copy-parameters';
+import {
+  bpmFromInput,
+  missingParameters,
+  parseBpm,
+  parseDynamics,
+  parseTimeSignature,
+  readDynamics,
+  withDynamicsLevel,
+} from './copy-parameters';
 
 describe('parseBpm', () => {
   it('приймає цілі в межах', () => {
@@ -131,5 +139,67 @@ describe('parseCopyPatch: параметри партій', () => {
 
   it('невідомі поля ігноруються, а порожній запит це помилка', () => {
     assert.deepEqual(parseCopyPatch({ other: 1 }), { ok: false, error: 'empty_patch' });
+  });
+});
+
+describe('bpmFromInput (поле темпу у формі)', () => {
+  it('порожнє поле це «не задано», і це допустимо', () => {
+    assert.deepEqual(bpmFromInput(''), { value: null, valid: true });
+    assert.deepEqual(bpmFromInput('   '), { value: null, valid: true });
+  });
+
+  it('ціле в межах приймається', () => {
+    assert.deepEqual(bpmFromInput('120'), { value: 120, valid: true });
+    assert.deepEqual(bpmFromInput('30'), { value: 30, valid: true });
+    assert.deepEqual(bpmFromInput('300'), { value: 300, valid: true });
+  });
+
+  it('поза межами, дробове й не число недопустимі', () => {
+    assert.equal(bpmFromInput('29').valid, false);
+    assert.equal(bpmFromInput('301').valid, false);
+    assert.equal(bpmFromInput('90.5').valid, false);
+    assert.equal(bpmFromInput('abc').valid, false);
+  });
+});
+
+describe('withDynamicsLevel', () => {
+  it('ставить рівень, не змінюючи вихідний об\'єкт', () => {
+    const before = { a: 2 };
+    assert.deepEqual(withDynamicsLevel(before, 'b', '4'), { a: 2, b: 4 });
+    assert.deepEqual(before, { a: 2 });
+  });
+
+  it('порожнє значення знімає рівень розділу', () => {
+    assert.deepEqual(withDynamicsLevel({ a: 2, b: 3 }, 'a', ''), { b: 3 });
+  });
+
+  it('замінює наявний рівень', () => {
+    assert.deepEqual(withDynamicsLevel({ a: 2 }, 'a', '5'), { a: 5 });
+  });
+});
+
+describe('межі динаміки', () => {
+  const entries = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`s${i}`, 3]));
+
+  it('parseDynamics: рівно 50 розділів ще можна, 51 вже ні', () => {
+    assert.notEqual(parseDynamics(entries(50)), null);
+    assert.equal(parseDynamics(entries(51)), null);
+  });
+
+  it('parseDynamics: довжина id від 1 до 60 символів', () => {
+    assert.deepEqual(parseDynamics({ a: 3 }), { a: 3 });
+    assert.equal(parseDynamics({ '': 3 }), null);
+    assert.notEqual(parseDynamics({ ['x'.repeat(60)]: 3 }), null);
+    assert.equal(parseDynamics({ ['x'.repeat(61)]: 3 }), null);
+  });
+
+  it('parseDynamics: рівні 1 і 5 приймаються, 0 і 6 ні', () => {
+    assert.deepEqual(parseDynamics({ a: 1, b: 5 }), { a: 1, b: 5 });
+    assert.equal(parseDynamics({ a: 0 }), null);
+    assert.equal(parseDynamics({ a: 6 }), null);
+  });
+
+  it('readDynamics: крайні рівні лишаються, поза межами відкидаються', () => {
+    assert.deepEqual(readDynamics({ a: 1, b: 5, c: 0, d: 6 }), { a: 1, b: 5 });
   });
 });

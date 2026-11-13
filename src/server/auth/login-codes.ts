@@ -1,5 +1,6 @@
 import { prisma } from '@/server/db';
 import { sendLoginCodeMail } from '@/server/mail';
+import { loginCodeState } from './login-code-state';
 import { CODE_MAX_ATTEMPTS, CODE_REQUESTS_PER_WINDOW, CODE_REQUEST_WINDOW_MS, CODE_TTL_MS, authSecret } from './config';
 import { generateLoginCode, hashLoginCode, safeEqualHex } from './crypto';
 
@@ -31,8 +32,8 @@ export async function verifyLoginCode(email: string, code: string): Promise<Veri
     orderBy: { createdAt: 'desc' },
   });
   if (!latest) return 'invalid';
-  if (latest.expiresAt.getTime() <= Date.now()) return 'expired';
-  if (latest.attempts >= CODE_MAX_ATTEMPTS) return 'too_many_attempts';
+  const state = loginCodeState(latest, new Date(), CODE_MAX_ATTEMPTS);
+  if (state !== 'open') return state;
 
   const matches = safeEqualHex(latest.codeHash, hashLoginCode(email, code, authSecret()));
   if (!matches) {

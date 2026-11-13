@@ -8,6 +8,7 @@ import {
   neighbours,
   nextPosition,
   refreshDataFromSong,
+  toCopyView,
   type SongSnapshot,
 } from './copies';
 
@@ -123,5 +124,61 @@ describe('порядок у плейлисті', () => {
     assert.deepEqual(neighbours(['a', 'b', 'c'], 'a'), { prev: null, next: 'b', index: 0 });
     assert.deepEqual(neighbours(['a', 'b', 'c'], 'c'), { prev: 'b', next: null, index: 2 });
     assert.deepEqual(neighbours(['a'], 'zzz'), { prev: null, next: null, index: -1 });
+  });
+});
+
+describe('toCopyView (що віддаємо про копію)', () => {
+  const row = {
+    id: 'c1',
+    playlistId: 'p1',
+    title: 'T',
+    artist: 'A',
+    language: 'uk' as const,
+    originalKey: 'Am',
+    body: '[Am]x',
+    keyShift: 2,
+    notes: 'n',
+    bpm: 90,
+    timeSignature: '4/4',
+    sectionDynamics: { verse: 3, chorus: 99, bad: 'x' },
+    isStandalone: false,
+    syncedVersion: 3,
+    sourceSong: { version: 3, deletedAt: null },
+    secret: 'не віддавати',
+  };
+
+  it('віддає лише поля копії, стан і очищену динаміку', () => {
+    assert.deepEqual(toCopyView(row), {
+      id: 'c1',
+      title: 'T',
+      artist: 'A',
+      language: 'uk',
+      originalKey: 'Am',
+      body: '[Am]x',
+      keyShift: 2,
+      notes: 'n',
+      bpm: 90,
+      timeSignature: '4/4',
+      sectionDynamics: { verse: 3 },
+      state: 'current',
+    });
+  });
+
+  it('стан рахується з оригіналу', () => {
+    assert.equal(toCopyView({ ...row, sourceSong: { version: 4, deletedAt: null } }).state, 'outdated');
+    assert.equal(toCopyView({ ...row, isStandalone: true }).state, 'standalone');
+  });
+});
+
+describe('moveItem: межі', () => {
+  it('перший вниз і останній вгору рухаються, за край ні', () => {
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'a', 1), ['b', 'a', 'c']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'c', -1), ['a', 'c', 'b']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'a', -1), ['a', 'b', 'c']);
+    assert.deepEqual(moveItem(['a', 'b', 'c'], 'c', 1), ['a', 'b', 'c']);
+  });
+
+  it('елемента немає в списку: без змін', () => {
+    assert.deepEqual(moveItem(['a', 'b'], 'z', 1), ['a', 'b']);
   });
 });
