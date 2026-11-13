@@ -3,6 +3,8 @@
  * Чисті функції без доступу до БД: легко тестуються.
  */
 
+import { readDynamics } from './copy-parameters';
+
 /** Поля оригіналу, потрібні, щоб зробити копію або оновити її. */
 export type SongSnapshot = {
   title: string;
@@ -63,6 +65,38 @@ export function copyState(copy: {
     return 'outdated';
   }
   return 'current';
+}
+
+type CopyRow = Parameters<typeof copyState>[0] & {
+  id: string;
+  title: string;
+  artist: string;
+  language: 'en' | 'uk';
+  originalKey: string;
+  body: string;
+  keyShift: number;
+  notes: string;
+  bpm: number | null;
+  timeSignature: string | null;
+  sectionDynamics: unknown;
+};
+
+/** Копія для показу й API: лише потрібні поля, динаміка очищена, стан синхронізації пораховано. */
+export function toCopyView(copy: CopyRow) {
+  return {
+    id: copy.id,
+    title: copy.title,
+    artist: copy.artist,
+    language: copy.language,
+    originalKey: copy.originalKey,
+    body: copy.body,
+    keyShift: copy.keyShift,
+    notes: copy.notes,
+    bpm: copy.bpm,
+    timeSignature: copy.timeSignature,
+    sectionDynamics: readDynamics(copy.sectionDynamics),
+    state: copyState(copy),
+  };
 }
 
 /** Позиція для нової копії в кінці плейлиста (позиції з нуля). */

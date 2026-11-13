@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { moveItem, shiftItemKey } from '@/entities/setlist';
+import { moveSetlistItem, shiftItemKey } from '@/entities/setlist';
 import { fmt, type Dictionary } from '@/shared/i18n';
 import { transposeKey } from '@/shared/lib/chords';
 import { IconArrowDown, IconArrowUp, IconChevronLeft, IconClose, IconMinus, IconPlus, IconSearch } from '@/shared/ui';
@@ -67,7 +67,7 @@ export function SetlistEditor({ setlist, stage, t }: Props) {
   }
 
   const move = (index: number, delta: -1 | 1) => {
-    const next = moveItem(items, index, delta);
+    const next = moveSetlistItem(items, index, delta);
     if (next) change(next);
   };
 

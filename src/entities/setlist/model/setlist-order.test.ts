@@ -1,19 +1,19 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { moveItem, shiftItemKey } from './setlist-order';
+import { moveSetlistItem, shiftItemKey } from './setlist-order';
 
-describe('moveItem', () => {
+describe('moveSetlistItem', () => {
   it('рухає пісню вгору й вниз, не чіпаючи вихідний список', () => {
     const list = ['a', 'b', 'c'];
-    assert.deepEqual(moveItem(list, 1, -1), ['b', 'a', 'c']);
-    assert.deepEqual(moveItem(list, 1, 1), ['a', 'c', 'b']);
+    assert.deepEqual(moveSetlistItem(list, 1, -1), ['b', 'a', 'c']);
+    assert.deepEqual(moveSetlistItem(list, 1, 1), ['a', 'c', 'b']);
     assert.deepEqual(list, ['a', 'b', 'c']);
   });
 
   it('за межі списку не рухає (повертає null)', () => {
-    assert.equal(moveItem(['a', 'b'], 0, -1), null);
-    assert.equal(moveItem(['a', 'b'], 1, 1), null);
-    assert.equal(moveItem([], 0, 1), null);
+    assert.equal(moveSetlistItem(['a', 'b'], 0, -1), null);
+    assert.equal(moveSetlistItem(['a', 'b'], 1, 1), null);
+    assert.equal(moveSetlistItem([], 0, 1), null);
   });
 });
 
