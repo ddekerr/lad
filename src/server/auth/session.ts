@@ -62,11 +62,6 @@ export async function setSessionCookie(token: string, expiresAt: Date) {
   });
 }
 
-export async function clearSessionCookie() {
-  const store = await cookies();
-  store.delete(SESSION_COOKIE);
-}
-
 /** Відкликає поточну сесію (вихід). */
 export async function revokeCurrentSession() {
   const store = await cookies();
